@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduFlow — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --sky:#38BDF8;
+  --sky-light:#E0F4FF;
+  --black:#0A0A0A;
+  --white:#FFFFFF;
+  --gray:#6B7280;
+  --gray-light:#F4F4F4;
+  --red:#E63946;
+  --pink:#FFB3C6;
+  --mint:#B5EAD7;
+  --yellow:#FFF176;
+  --lavender:#C5B4E3;
+  --sidebar-w:260px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:var(--black);}
+
+/* ========== SIDEBAR ========== */
+#sidebar{
+  position:fixed;top:0;left:0;
+  width:var(--sidebar-w);height:100vh;
+  background:var(--black);
+  display:flex;flex-direction:column;
+  z-index:100;
+  padding:0 0 24px;
+}
+.sb-brand{
+  padding:28px 24px 24px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;gap:12px;
+}
+.sb-brand-icon{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.sb-brand-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:3px;color:#fff;
+}
+.sb-brand-role{
+  font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,0.4);
+  margin-top:1px;
+}
+.sb-section{
+  padding:20px 16px 8px;
+  font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,0.3);
+}
+.sb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;margin:2px 8px;
+  border-radius:12px;
+  color:rgba(255,255,255,0.6);
+  font-size:14px;font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.sb-item.active{background:var(--sky);color:var(--black);}
+.sb-item .icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  background:rgba(255,255,255,0.08);
+  flex-shrink:0;
+}
+.sb-item.active .icon{background:rgba(0,0,0,0.15);}
+.sb-bottom{margin-top:auto;padding:0 8px;}
+.sb-user{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:12px;
+  background:rgba(255,255,255,0.05);
+  margin:0 0 8px;
+}
+.sb-avatar{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:16px;color:var(--black);
+  flex-shrink:0;
+}
+.sb-uname{font-size:13px;font-weight:600;color:#fff;}
+.sb-urole{font-size:11px;color:rgba(255,255,255,0.4);}
+.sb-logout{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:12px;
+  color:rgba(255,255,255,0.4);font-size:13px;
+  cursor:pointer;transition:all 0.2s;
+}
+.sb-logout:hover{background:rgba(230,57,70,0.15);color:var(--red);}
+
+/* ========== MAIN ========== */
+#main{
+  margin-left:var(--sidebar-w);
+  min-height:100vh;
+  padding:32px;
+  width:calc(100% - var(--sidebar-w));
+  float:right;
+}
+
+/* ========== TOPBAR ========== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;
+}
+.topbar-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;letter-spacing:2px;
+}
+.topbar-sub{font-size:13px;color:var(--gray);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.badge-date{
+  background:#fff;border:1px solid #E5E7EB;
+  padding:8px 16px;border-radius:100px;
+  font-size:12px;font-family:'Space Mono',monospace;
+  color:var(--gray);
+}
+
+/* ========== STAT CARDS ========== */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:28px;
+}
+.stat-card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  border:1px solid #F0F0F0;
+  position:relative;overflow:hidden;
+  transition:transform 0.2s,box-shadow 0.2s;
+  cursor:default;
+}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+.stat-card-icon{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:16px;
+}
+.stat-card-n{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:42px;letter-spacing:1px;line-height:1;
+  margin-bottom:4px;
+}
+.stat-card-l{font-size:13px;color:var(--gray);}
+.stat-card-bg{
+  position:absolute;right:-16px;bottom:-16px;
+  font-size:80px;opacity:0.06;
+  font-family:'Bebas Neue',sans-serif;
+  letter-spacing:2px;
+  pointer-events:none;
+}
+
+/* ========== SECTION TITLE ========== */
+.sec-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:2px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.sec-title span{
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;letter-spacing:1px;
+  color:var(--gray);font-weight:400;
+  text-transform:uppercase;
+}
+
+/* ========== TWO COL ========== */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:28px;}
+
+/* ========== CARD ========== */
+.card{
+  background:#fff;border-radius:20px;
+  padding:24px;border:1px solid #F0F0F0;
+  overflow-x:auto;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.card-title{font-size:15px;font-weight:600;}
+.card-action{
+  font-size:12px;color:var(--sky);
+  cursor:pointer;font-weight:500;
+  background:var(--sky-light);
+  padding:6px 14px;border-radius:100px;
+  border:none;
+  transition:all 0.2s;
+}
+.card-action:hover{background:var(--sky);color:#fff;}
+
+/* ========== TABLE ========== */
+.ef-table{width:100%;border-collapse:collapse;}
+.ef-table th{
+  font-size:11px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--gray);
+  padding:8px 12px;text-align:left;
+  border-bottom:1px solid #F0F0F0;
+}
+.ef-table td{
+  padding:12px;font-size:13px;
+  border-bottom:1px solid #F9F9F9;
+}
+.ef-table tr:last-child td{border-bottom:none;}
+.ef-table tr:hover td{background:#FAFAFA;}
+
+/* ========== PILL ========== */
+.pill{
+  display:inline-flex;align-items:center;
+  padding:4px 12px;border-radius:100px;
+  font-size:11px;font-weight:600;letter-spacing:0.5px;
+}
+.pill-blue{background:var(--sky-light);color:#0284C7;}
+.pill-green{background:#D1FAE5;color:#065F46;}
+.pill-red{background:#FEE2E2;color:#991B1B;}
+.pill-yellow{background:#FEF9C3;color:#854D0E;}
+.pill-purple{background:#EDE9FE;color:#5B21B6;}
+
+/* ========== QUICK ACTION CARDS ========== */
+.action-card{
+  background:#fff;border-radius:20px;
+  padding:24px;border:1px solid #F0F0F0;
+  display:flex;flex-direction:column;gap:12px;
+  transition:all 0.2s;cursor:pointer;
+}
+.action-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+.action-card-icon{
+  width:52px;height:52px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+}
+.action-card-title{font-size:15px;font-weight:600;}
+.action-card-desc{font-size:12px;color:var(--gray);line-height:1.6;}
+.action-arrow{font-size:20px;color:var(--gray);margin-top:auto;}
+
+/* ========== TIMETABLE PREVIEW ========== */
+.tt-grid{width:100%;border-collapse:collapse;font-size:12px;}
+.tt-grid th{
+  background:var(--black);color:#fff;
+  padding:10px 8px;text-align:center;
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+}
+.tt-grid td{
+  padding:8px;text-align:center;
+  border:1px solid #F0F0F0;
+  vertical-align:top;min-width:80px;
+}
+.tt-cell{
+  background:var(--sky-light);
+  border-radius:8px;padding:6px 8px;
+  font-size:11px;line-height:1.4;
+}
+.tt-cell.pink{background:var(--pink);}
+.tt-cell.mint{background:var(--mint);}
+.tt-cell.yellow{background:var(--yellow);}
+.tt-cell.lavender{background:var(--lavender);}
+.tt-cell-sub{font-weight:600;color:var(--black);}
+.tt-cell-fac{color:var(--gray);font-size:10px;}
+
+/* ========== MODAL ========== */
+.modal-bg{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(8px);
+  z-index:500;
+  display:none;align-items:center;justify-content:center;
+}
+.modal-bg.open{display:flex;}
+.modal-box{
+  background:#fff;border-radius:24px;
+  padding:40px;width:100%;max-width:500px;
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,0.12);
+  animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes modalIn{from{transform:translateY(20px) scale(0.97);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  background:#F4F4F4;border:none;
+  width:32px;height:32px;border-radius:50%;
+  font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:2px;margin-bottom:4px;
+}
+.modal-sub{font-size:13px;color:var(--gray);margin-bottom:24px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.fg input,.fg select{
+  width:100%;background:#F7F9FC;
+  border:1.5px solid #E5E7EB;color:var(--black);
+  padding:12px 16px;border-radius:12px;
+  font-size:14px;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
+.fg input:focus,.fg select:focus{border-color:var(--sky);background:#fff;}
+.btn-primary{
+  width:100%;background:var(--black);color:#fff;
+  border:none;padding:14px;border-radius:100px;
+  font-size:14px;font-weight:600;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;letter-spacing:0.5px;
+  transition:all 0.2s;margin-top:8px;
+}
+.btn-primary:hover{background:var(--sky);color:var(--black);}
+
+/* ========== PAGE SECTIONS ========== */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ========== EMPTY STATE ========== */
+.empty{
+  text-align:center;padding:48px 24px;
+  color:var(--gray);
+}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-text{font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon">
+      <svg width="22" height="22" viewBox="0 0 120 120" fill="none">
+        <rect x="18" y="20" width="10" height="80" fill="#0A0A0A"/>
+        <rect x="18" y="20" width="38" height="10" fill="#0A0A0A"/>
+        <rect x="18" y="55" width="30" height="10" fill="#0A0A0A"/>
+        <rect x="18" y="90" width="38" height="10" fill="#0A0A0A"/>
+        <rect x="62" y="20" width="10" height="80" fill="#0A0A0A"/>
+        <rect x="62" y="20" width="32" height="10" fill="#0A0A0A"/>
+        <rect x="62" y="55" width="24" height="10" fill="#0A0A0A"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sb-brand-name">EduFlow</div>
+      <div class="sb-brand-role">Admin Panel</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <a class="sb-item active" onclick="showPage('dashboard')">
+    <div class="icon">📊</div> Dashboard
+  </a>
+  <a class="sb-item" onclick="showPage('faculty')">
+    <div class="icon">👩‍🏫</div> Faculty
+  </a>
+  <a class="sb-item" onclick="showPage('subjects')">
+    <div class="icon">📚</div> Subjects
+  </a>
+
+
+  <div class="sb-section">Timetable</div>
+  <a class="sb-item" onclick="showPage('timetables')">
+    <div class="icon">📅</div> View Timetables
+  </a>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar" id="adminAvatar">A</div>
+      <div>
+        <div class="sb-uname" id="adminName">Admin</div>
+        <div class="sb-urole">Admin / HOD</div>
+      </div>
+    </div>
+    <div class="sb-logout" onclick="logout()">
+      <span>🚪</span> Logout
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main">
+
+  <!-- ===== DASHBOARD PAGE ===== -->
+  <div class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-sub">Welcome back! Here's what's happening today.</div>
+      </div>
+      <div class="topbar-right">
+        <div class="badge-date" id="adminDate">—</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:#E0F4FF;">👩‍🏫</div>
+        <div class="stat-card-n" style="color:#0284C7;" id="countFaculty">0</div>
+        <div class="stat-card-l">Total Faculty</div>
+        <div class="stat-card-bg">FAC</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:#D1FAE5;">📚</div>
+        <div class="stat-card-n" style="color:#065F46;" id="countSubjects">0</div>
+        <div class="stat-card-l">Total Subjects</div>
+        <div class="stat-card-bg">SUB</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:#EDE9FE;">📅</div>
+        <div class="stat-card-n" style="color:#5B21B6;" id="countTimetables">0</div>
+        <div class="stat-card-l">Timetables Generated</div>
+        <div class="stat-card-bg">TT</div>
+      </div>
+    </div>
+
+    <div class="sec-title">Quick Actions <span>manage everything from here</span></div>
+    <div class="three-col">
+      <div class="action-card" onclick="showPage('faculty')">
+        <div class="action-card-icon" style="background:#E0F4FF;">👩‍🏫</div>
+        <div class="action-card-title">Manage Faculty</div>
+        <div class="action-card-desc">Add, view and manage all faculty members and their departments.</div>
+        <div class="action-arrow">→</div>
+      </div>
+      <div class="action-card" onclick="showPage('subjects')">
+        <div class="action-card-icon" style="background:#D1FAE5;">📚</div>
+        <div class="action-card-title">Manage Subjects</div>
+        <div class="action-card-desc">Add subjects, assign faculty and set grade points for timetable generation.</div>
+        <div class="action-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Faculty</div>
+          <button class="card-action" onclick="showPage('faculty')">View All</button>
+        </div>
+        <table class="ef-table" id="dashFacultyTable">
+          <thead><tr><th>Name</th><th>Department</th><th>Status</th></tr></thead>
+          <tbody id="dashFacultyBody">
+            <tr><td colspan="3"><div class="empty"><div class="empty-icon">👩‍🏫</div><div class="empty-text">No faculty added yet</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Subjects</div>
+          <button class="card-action" onclick="showPage('subjects')">View All</button>
+        </div>
+        <table class="ef-table" id="dashSubjectTable">
+          <thead><tr><th>Subject</th><th>Faculty</th><th>Grades</th></tr></thead>
+          <tbody id="dashSubjectBody">
+            <tr><td colspan="3"><div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No subjects added yet</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FACULTY PAGE ===== -->
+  <div class="page" id="page-faculty">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Faculty Management</div>
+        <div class="topbar-sub">Add and manage all faculty members</div>
+      </div>
+      <div class="topbar-right">
+        <button class="card-action" onclick="openModal('modalFaculty')" style="font-size:14px;padding:10px 20px;">+ Add Faculty</button>
+      </div>
+    </div>
+    <div class="card">
+      <table class="ef-table">
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Department</th><th>Subjects</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="facultyTableBody">
+          <tr><td colspan="7"><div class="empty"><div class="empty-icon">👩‍🏫</div><div class="empty-text">No faculty added yet. Click "+ Add Faculty" to get started.</div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SUBJECTS PAGE ===== -->
+  <div class="page" id="page-subjects">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Subjects</div>
+        <div class="topbar-sub">Manage subjects and grade points</div>
+      </div>
+      <div class="topbar-right">
+        <button class="card-action" onclick="openModal('modalSubject')" style="font-size:14px;padding:10px 20px;">+ Add Subject</button>
+      </div>
+    </div>
+    <div class="card">
+      <table class="ef-table">
+        <thead><tr><th>#</th><th>Subject</th><th>Code</th><th>Faculty</th><th>Year / Division</th><th>Semester</th><th>Grades/Week</th><th>Type</th><th>Action</th></tr></thead>
+        <tbody id="subjectTableBody">
+          <tr><td colspan="9"><div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No subjects added yet. Click "+ Add Subject" to get started.</div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+  <!-- ===== TIMETABLES PAGE ===== -->
+  <div class="page" id="page-timetables">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Timetables</div>
+        <div class="topbar-sub">Generate and view timetables for each division</div>
+      </div>
+      <div class="topbar-right">
+        <button class="card-action" onclick="showGenerator()" style="font-size:14px;padding:10px 20px;">+ Generate New</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Setup -->
+    <div id="ttSetup" class="card" style="margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:20px;">Step 1 — Division Setup</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;">
+        <div class="fg">
+          <label>Year</label>
+          <select id="ttYear">
+            <option value="">Select Year</option>
+            <option>FY</option>
+            <option>SY</option>
+            <option>TY</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Division</label>
+          <select id="ttDiv">
+            <option value="">Select Division</option>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+            <option>D</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Semester</label>
+          <select id="ttSem">
+            <option value="">Select Semester</option>
+            <option>Semester 1</option>
+            <option>Semester 2</option>
+            <option>Semester 3</option>
+            <option>Semester 4</option>
+            <option>Semester 5</option>
+            <option>Semester 6</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Department</label>
+          <select id="ttDept">
+            <option value="">Select Department</option>
+            <option>CSE - AIML</option>
+            <option>CSE - DS</option>
+            <option>CSE</option>
+            <option>Electrical</option>
+            <option>Mechanical</option>
+            <option>ENTC</option>
+            <option>BSH</option>
+            <option>Biotech</option>
+            <option>Civil</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" style="max-width:200px;" onclick="loadSubjectsForTT()">Next → Assign Subjects</button>
+    </div>
+
+    <!-- STEP 2: Assign subjects to this division -->
+    <div id="ttAssign" class="card" style="margin-bottom:20px;display:none;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:6px;">Step 2 — Assign Subjects & Faculty</div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:20px;">Select subjects for this division and assign faculty to each</div>
+      <div id="ttSubjectList"></div>
+      <button class="btn-primary" style="max-width:220px;margin-top:16px;" onclick="generateTimetable()">⚡ Generate Timetable</button>
+    </div>
+
+    <!-- STEP 3: Generated Timetable -->
+    <div id="ttResult" style="display:none;">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;" id="ttResultTitle">Timetable</div>
+            <div style="font-size:13px;color:var(--gray);" id="ttResultSub">—</div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="printTT()" style="background:#D1FAE5;color:#065F46;border:none;padding:10px 20px;border-radius:100px;font-size:13px;cursor:pointer;font-weight:600;">🖨 Print</button>
+            <button onclick="saveTimetable()" style="background:var(--black);color:#fff;border:none;padding:10px 20px;border-radius:100px;font-size:13px;cursor:pointer;font-weight:600;">💾 Save</button>
+            <button onclick="resetGenerator()" style="background:#FEE2E2;color:#991B1B;border:none;padding:10px 20px;border-radius:100px;font-size:13px;cursor:pointer;font-weight:600;">✕ Close</button>
+          </div>
+        </div>
+        <div id="ttWarning" style="display:none;margin:-4px 0 14px 0;padding:10px 12px;border-radius:10px;background:#FEF3C7;color:#92400E;font-size:12px;font-weight:600;border:1px solid #FCD34D;"></div>
+        <div style="overflow-x:auto;" id="ttGridWrap"></div>
+      </div>
+    </div>
+
+    <!-- Saved Timetables List -->
+    <div class="card" id="savedTTCard">
+      <div class="card-header">
+        <div class="card-title">Saved Timetables</div>
+      </div>
+      <div id="savedTTList">
+        <div class="empty"><div class="empty-icon">📅</div><div class="empty-text">No timetables saved yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: Edit Faculty -->
+<div class="modal-bg" id="modalEditFaculty">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEditFaculty')">✕</button>
+    <div class="modal-title">Edit Faculty</div>
+    <div class="modal-sub">Update faculty details below</div>
+    <input type="hidden" id="editFacId"/>
+    <div class="fg"><label>Full Name</label><input type="text" id="editFacName" placeholder="Enter faculty name"/></div>
+    <div class="fg"><label>Email</label><input type="email" id="editFacEmail" placeholder="faculty@college.edu.in"/></div>
+    <button class="btn-primary" onclick="updateFaculty()">Update Faculty</button>
+  </div>
+</div>
+
+<!-- MODAL: Edit Subject -->
+<div class="modal-bg" id="modalEditSubject">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEditSubject')">✕</button>
+    <div class="modal-title">Edit Subject</div>
+    <div class="modal-sub">Update subject details below</div>
+    <input type="hidden" id="editSubId"/>
+    <div class="fg"><label>Subject Name</label><input type="text" id="editSubName" placeholder="e.g. Data Structures"/></div>
+    <div class="fg"><label>Subject Code</label><input type="text" id="editSubCode" placeholder="e.g. CS301"/></div>
+    <div class="fg"><label>Assign Faculty</label>
+      <select id="editSubFaculty"><option value="">Select Faculty</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="fg"><label>Year</label>
+        <select id="editSubYear">
+          <option value="">Select Year</option>
+          <option>FY</option><option>SY</option><option>TY</option>
+        </select>
+      </div>
+      <div class="fg"><label>Division</label>
+        <select id="editSubDiv">
+          <option value="">Select Division</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option>
+        </select>
+      </div>
+      <div class="fg"><label>Semester</label>
+        <select id="editSubSem">
+          <option value="">Select Sem</option>
+          <option>Semester 1</option><option>Semester 2</option>
+          <option>Semester 3</option><option>Semester 4</option>
+          <option>Semester 5</option><option>Semester 6</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Grades Per Week</label>
+      <input type="number" id="editSubGrades" placeholder="e.g. 3" min="1" max="6"/>
+    </div>
+    <div class="fg"><label>Type</label>
+      <select id="editSubType">
+        <option>Lecture</option>
+        <option>Lab</option>
+        <option>Tutorial</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="updateSubject()">Update Subject</button>
+  </div>
+</div>
+<div class="modal-bg" id="modalFaculty">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalFaculty')">✕</button>
+    <div class="modal-title">Add Faculty</div>
+    <div class="modal-sub">Fill in the faculty details below</div>
+    <div class="fg"><label>Full Name</label><input type="text" id="facName" placeholder="Enter faculty name"/></div>
+    <div class="fg"><label>Email</label><input type="email" id="facEmail" placeholder="faculty@college.edu.in"/></div>
+    <button class="btn-primary" onclick="addFaculty()">Add Faculty</button>
+  </div>
+</div>
+
+<!-- MODAL: Add Subject -->
+<div class="modal-bg" id="modalSubject">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalSubject')">✕</button>
+    <div class="modal-title">Add Subject</div>
+    <div class="modal-sub">Fill in the subject details below</div>
+    <div class="fg"><label>Subject Name</label><input type="text" id="subName" placeholder="e.g. Data Structures"/></div>
+    <div class="fg"><label>Subject Code</label><input type="text" id="subCode" placeholder="e.g. CS301"/></div>
+    <div class="fg"><label>Assign Faculty</label>
+      <select id="subFaculty"><option value="">Select Faculty</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="fg"><label>Year</label>
+        <select id="subYear">
+          <option value="">Select Year</option>
+          <option>FY</option><option>SY</option><option>TY</option>
+        </select>
+      </div>
+      <div class="fg"><label>Division</label>
+        <select id="subDiv">
+          <option value="">Select Division</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option>
+        </select>
+      </div>
+      <div class="fg"><label>Semester</label>
+        <select id="subSem">
+          <option value="">Select Sem</option>
+          <option>Semester 1</option><option>Semester 2</option>
+          <option>Semester 3</option><option>Semester 4</option>
+          <option>Semester 5</option><option>Semester 6</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Grades Per Week (lectures)</label>
+      <input type="number" id="subGrades" placeholder="e.g. 3 (means 3 lectures/week)" min="1" max="6"/>
+    </div>
+    <div class="fg"><label>Type</label>
+      <select id="subType">
+        <option>Lecture</option>
+        <option>Lab</option>
+        <option>Tutorial</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="addSubject()">Add Subject</button>
+  </div>
+</div>
+
+
+
+<script>
+// ========== AUTH CHECK ==========
+const token = localStorage.getItem('token');
+const role  = localStorage.getItem('role');
+const name  = localStorage.getItem('name') || 'Admin';
+const adminDepartment = localStorage.getItem('department') || '';
+if (!token || role !== 'Admin / HOD') {
+  window.location.href = 'index.html';
+}
+
+// Set admin name
+document.getElementById('adminName').textContent = name;
+document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+
+// Date
+const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const now    = new Date();
+document.getElementById('adminDate').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+// ========== DATA ==========
+let faculty  = JSON.parse(localStorage.getItem('ef_faculty')  || '[]');
+let subjects = JSON.parse(localStorage.getItem('ef_subjects') || '[]');
+
+// ── MIGRATION: stamp any legacy subject/faculty (no dept) with the
+//    current HOD's department, then immediately persist so it only
+//    runs once per browser.
+(function migrateLegacyData() {
+  if (!adminDepartment) return;
+  let changed = false;
+
+  faculty = faculty.map(f => {
+    if (!f.dept) { changed = true; return { ...f, dept: adminDepartment }; }
+    return f;
+  });
+
+  subjects = subjects.map(s => {
+    if (!s.dept) { changed = true; return { ...s, dept: adminDepartment }; }
+    return s;
+  });
+
+  if (changed) {
+    localStorage.setItem('ef_faculty',  JSON.stringify(faculty));
+    localStorage.setItem('ef_subjects', JSON.stringify(subjects));
+  }
+})();
+
+function saveData() {
+  localStorage.setItem('ef_faculty',  JSON.stringify(faculty));
+  localStorage.setItem('ef_subjects', JSON.stringify(subjects));
+}
+
+function getVisibleFaculty() {
+  if (!adminDepartment) return faculty;
+  return faculty.filter(f => (f.dept || '') === adminDepartment);
+}
+
+function getVisibleSubjects() {
+  if (!adminDepartment) return subjects;
+  return subjects.filter(s => (s.dept || '') === adminDepartment);
+}
+
+function syncFacultyDepartmentFields() {
+  const addDeptField = document.getElementById('facDept');
+  const editDeptField = document.getElementById('editFacDept');
+  if (addDeptField) addDeptField.value = adminDepartment;
+  if (editDeptField) editDeptField.value = adminDepartment;
+}
+
+function syncTimetableDepartmentField() {
+  const timetableDeptField = document.getElementById('ttDept');
+  if (!timetableDeptField) return;
+
+  if (adminDepartment) {
+    timetableDeptField.value = adminDepartment;
+    timetableDeptField.disabled = true;
+    timetableDeptField.setAttribute('title', 'Department is set from the logged-in admin account');
+  } else {
+    timetableDeptField.disabled = false;
+    timetableDeptField.removeAttribute('title');
+  }
+}
+
+// ========== PAGE NAVIGATION ==========
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget && event.currentTarget.classList.add('active');
+  renderAll();
+}
+
+// ========== MODAL ==========
+function openModal(id) { document.getElementById(id).classList.add('open'); syncFacultyDepartmentFields(); populateFacultySelect(); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function populateFacultySelect() {
+  const sel = document.getElementById('subFaculty');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select Faculty</option>';
+  getVisibleFaculty().forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.name; opt.textContent = f.name;
+    sel.appendChild(opt);
+  });
+}
+
+function formatFacultyName(name) {
+  return name.trim().replace(/\s+/g, ' ');
+}
+
+function normalizeFacultyName(name) {
+  return formatFacultyName(name).toLowerCase();
+}
+
+function normalizeSubjectText(value) {
+  return (value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function getSubjectDuplicateKey(subject) {
+  return [
+    normalizeSubjectText(subject.name),
+    normalizeSubjectText(subject.code),
+    normalizeSubjectText(subject.faculty),
+    normalizeSubjectText(subject.year),
+    normalizeSubjectText(subject.div),
+    normalizeSubjectText(subject.sem),
+    Number.parseInt(subject.grades, 10) || 0,
+    normalizeSubjectText(subject.type)
+  ].join('|');
+}
+
+function getSubjectIdentityKey(subject) {
+  return [
+    normalizeSubjectText(subject.name),
+    normalizeSubjectText(subject.code)
+  ].join('|');
+}
+
+function isDuplicateSubject(subject, excludeId = null) {
+  const duplicateKey = getSubjectDuplicateKey(subject);
+  return getVisibleSubjects().some(s => s.id !== excludeId && getSubjectDuplicateKey(s) === duplicateKey);
+}
+
+function dedupeSubjects() {
+  const seen = new Set();
+  let removedCount = 0;
+
+  subjects = subjects.filter(subject => {
+    const key = getSubjectDuplicateKey(subject);
+    if (seen.has(key)) {
+      removedCount += 1;
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+
+  return removedCount;
+}
+
+function isDuplicateFacultyName(name, excludeId = null) {
+  const normalizedName = normalizeFacultyName(name);
+  return faculty.some(f =>
+    f.id !== excludeId &&
+    (!adminDepartment || (f.dept || '') === adminDepartment) &&
+    normalizeFacultyName(f.name) === normalizedName
+  );
+}
+
+// ========== ADD FACULTY ==========
+function addFaculty() {
+  const name  = formatFacultyName(document.getElementById('facName').value);
+  const dept  = adminDepartment;
+  const email = document.getElementById('facEmail').value.trim();
+  if (!dept) { alert('Your department is missing. Please log in again.'); return; }
+  if (!name) { alert('Please enter faculty name!'); return; }
+  if (isDuplicateFacultyName(name)) {
+    alert('Faculty name already exists. Please enter a different name.');
+    return;
+  }
+  faculty.push({ id: Date.now(), name, dept, email, status: 'Active' });
+  saveData(); renderAll(); closeModal('modalFaculty');
+  document.getElementById('facName').value = '';
+  document.getElementById('facEmail').value = '';
+}
+
+// ========== ADD SUBJECT ==========
+function addSubject() {
+  const name   = document.getElementById('subName').value.trim().replace(/\s+/g, ' ');
+  const code   = document.getElementById('subCode').value.trim().replace(/\s+/g, ' ');
+  const fac    = document.getElementById('subFaculty').value;
+  const year   = document.getElementById('subYear').value;
+  const div    = document.getElementById('subDiv').value;
+  const sem    = document.getElementById('subSem').value;
+  const grades = document.getElementById('subGrades').value;
+  const type   = document.getElementById('subType').value;
+  if (!name || !grades) { alert('Please fill subject name and grades!'); return; }
+  const nextSubject = { id: Date.now(), name, code, faculty: fac, year, div, sem, grades: parseInt(grades, 10), type, dept: adminDepartment };
+  if (isDuplicateSubject(nextSubject)) {
+    alert('This subject already exists for the same faculty, year, division, semester, grades and type.');
+    return;
+  }
+  subjects.push(nextSubject);
+  saveData(); renderAll(); closeModal('modalSubject');
+  document.getElementById('subName').value   = '';
+  document.getElementById('subCode').value   = '';
+  document.getElementById('subGrades').value = '';
+  document.getElementById('subYear').value   = '';
+  document.getElementById('subDiv').value    = '';
+  document.getElementById('subSem').value    = '';
+}
+
+
+
+// ========== RENDER ALL ==========
+function renderAll() {
+  const visibleFaculty = getVisibleFaculty();
+  const visibleSubjects = getVisibleSubjects();
+  document.getElementById('countFaculty').textContent   = visibleFaculty.length;
+  document.getElementById('countSubjects').textContent  = visibleSubjects.length;
+  document.getElementById('countTimetables').textContent = JSON.parse(localStorage.getItem('ef_timetables') || '[]').length;
+
+  // faculty table
+  const fb = document.getElementById('facultyTableBody');
+  if (visibleFaculty.length === 0) {
+    fb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">👩‍🏫</div><div class="empty-text">No faculty added yet.</div></div></td></tr>`;
+  } else {
+    fb.innerHTML = visibleFaculty.map((f,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${f.name}</strong></td>
+        <td style="color:var(--gray);font-size:12px;">${f.email || '—'}</td>
+        <td><span class="pill pill-blue">${f.dept}</span></td>
+        <td>${visibleSubjects.filter(s => s.faculty === f.name).length} subjects</td>
+        <td><span class="pill pill-green">${f.status}</span></td>
+        <td>
+          <button onclick="editFaculty(${f.id})" style="background:#E0F4FF;color:#0284C7;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;margin-right:6px;font-weight:600;">Edit</button>
+          <button onclick="deleteFaculty(${f.id})" style="background:#FEE2E2;color:#991B1B;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;font-weight:600;">Delete</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // subjects table
+  const sb = document.getElementById('subjectTableBody');
+  if (visibleSubjects.length === 0) {
+    sb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No subjects added yet.</div></div></td></tr>`;
+  } else {
+    sb.innerHTML = visibleSubjects.map((s,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${s.name}</strong></td>
+        <td style="color:var(--gray);font-size:12px;">${s.code || '—'}</td>
+        <td>${s.faculty || '—'}</td>
+        <td><span class="pill pill-blue">${s.year || '—'} / ${s.div || '—'}</span></td>
+        <td style="font-size:12px;color:var(--gray);">${s.sem || '—'}</td>
+        <td><span class="pill pill-purple">${s.grades} per week</span></td>
+        <td><span class="pill ${s.type==='Lab'?'pill-yellow':s.type==='Tutorial'?'pill-green':'pill-blue'}">${s.type}</span></td>
+        <td>
+          <button onclick="editSubject(${s.id})" style="background:#E0F4FF;color:#0284C7;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;margin-right:6px;font-weight:600;">Edit</button>
+          <button onclick="deleteSubject(${s.id})" style="background:#FEE2E2;color:#991B1B;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;font-weight:600;">Delete</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // dashboard recent tables
+  const dfb = document.getElementById('dashFacultyBody');
+  if (visibleFaculty.length === 0) {
+    dfb.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="empty-icon">👩‍🏫</div><div class="empty-text">No faculty added yet</div></div></td></tr>`;
+  } else {
+    dfb.innerHTML = visibleFaculty.slice(0,4).map(f => `
+      <tr>
+        <td><strong>${f.name}</strong></td>
+        <td>${f.dept}</td>
+        <td><span class="pill pill-green">Active</span></td>
+      </tr>`).join('');
+  }
+
+  const dsb = document.getElementById('dashSubjectBody');
+  if (visibleSubjects.length === 0) {
+    dsb.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No subjects added yet</div></div></td></tr>`;
+  } else {
+    dsb.innerHTML = visibleSubjects.slice(0,4).map(s => `
+      <tr>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.faculty || '—'}</td>
+        <td><span class="pill pill-purple">${s.grades}/wk</span></td>
+      </tr>`).join('');
+  }
+}
+
+// ========== EDIT FACULTY ==========
+function editFaculty(id) {
+  const f = faculty.find(f => f.id === id);
+  if (!f) return;
+  document.getElementById('editFacId').value   = f.id;
+  document.getElementById('editFacName').value  = f.name;
+  document.getElementById('editFacEmail').value = f.email || '';
+  openModal('modalEditFaculty');
+}
+function updateFaculty() {
+  const id   = parseInt(document.getElementById('editFacId').value);
+  const name = formatFacultyName(document.getElementById('editFacName').value);
+  const dept = adminDepartment;
+  const email= document.getElementById('editFacEmail').value.trim();
+  if (!dept) { alert('Your department is missing. Please log in again.'); return; }
+  if (!name) { alert('Please enter faculty name!'); return; }
+  if (isDuplicateFacultyName(name, id)) {
+    alert('Faculty name already exists. Please enter a different name.');
+    return;
+  }
+  const idx = faculty.findIndex(f => f.id === id);
+  if (idx !== -1) {
+    const previousName = faculty[idx].name;
+    faculty[idx] = { ...faculty[idx], name, dept, email };
+
+    if (previousName !== name) {
+      subjects = subjects.map(s =>
+        s.faculty === previousName ? { ...s, faculty: name } : s
+      );
+    }
+  }
+  saveData(); renderAll(); closeModal('modalEditFaculty');
+}
+function deleteFaculty(id) {
+  if (!confirm('Are you sure you want to delete this faculty?')) return;
+  faculty = faculty.filter(f => f.id !== id);
+  saveData(); renderAll();
+}
+
+// ========== EDIT SUBJECT ==========
+function editSubject(id) {
+  const s = subjects.find(s => s.id === id);
+  if (!s) return;
+  document.getElementById('editSubId').value     = s.id;
+  document.getElementById('editSubName').value   = s.name;
+  document.getElementById('editSubCode').value   = s.code || '';
+  document.getElementById('editSubGrades').value = s.grades;
+  document.getElementById('editSubType').value   = s.type;
+  document.getElementById('editSubYear').value   = s.year || '';
+  document.getElementById('editSubDiv').value    = s.div || '';
+  document.getElementById('editSubSem').value    = s.sem || '';
+  const sel = document.getElementById('editSubFaculty');
+  sel.innerHTML = '<option value="">Select Faculty</option>';
+  getVisibleFaculty().forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.name; opt.textContent = f.name;
+    if (f.name === s.faculty) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  openModal('modalEditSubject');
+}
+function updateSubject() {
+  const id     = parseInt(document.getElementById('editSubId').value);
+  const name   = document.getElementById('editSubName').value.trim().replace(/\s+/g, ' ');
+  const code   = document.getElementById('editSubCode').value.trim().replace(/\s+/g, ' ');
+  const fac    = document.getElementById('editSubFaculty').value;
+  const year   = document.getElementById('editSubYear').value;
+  const div    = document.getElementById('editSubDiv').value;
+  const sem    = document.getElementById('editSubSem').value;
+  const grades = parseInt(document.getElementById('editSubGrades').value);
+  const type   = document.getElementById('editSubType').value;
+  if (!name || !grades) { alert('Please fill all fields!'); return; }
+  const updatedSubject = { id, name, code, faculty: fac, year, div, sem, grades, type };
+  if (isDuplicateSubject(updatedSubject, id)) {
+    alert('This subject already exists for the same faculty, year, division, semester, grades and type.');
+    return;
+  }
+  const idx = subjects.findIndex(s => s.id === id);
+  if (idx !== -1) { subjects[idx] = { ...subjects[idx], ...updatedSubject }; }
+  saveData(); renderAll(); closeModal('modalEditSubject');
+}
+function deleteSubject(id) {
+  if (!confirm('Are you sure you want to delete this subject?')) return;
+  subjects = subjects.filter(s => s.id !== id);
+  saveData(); renderAll();
+}
+
+// ========== TIMETABLE GENERATOR ==========
+const DAYS = ['Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SLOTS = [
+  { label:'9:15 – 10:05',  type:'lec',   period: 'morning' },
+  { label:'10:05 – 10:55', type:'lec',   period: 'morning' },
+  { label:'10:55 – 11:15', type:'break', name:'Break' },
+  { label:'11:15 – 12:05', type:'lec',   period: 'morning' },
+  { label:'12:05 – 12:55', type:'lec',   period: 'morning' },
+  { label:'12:55 – 1:45',  type:'lunch', name:'Lunch Break' },
+  { label:'1:45 – 2:35',   type:'lec',   period: 'afternoon' },
+  { label:'2:35 – 3:25',   type:'lec',   period: 'afternoon' },
+  { label:'3:25 – 4:15',   type:'lec',   period: 'afternoon' },
+];
+const CELL_COLORS = ['#E0F4FF','#FFB3C6','#B5EAD7','#FFF176','#C5B4E3','#FFDAB9','#D1FAE5','#FEE2E2'];
+const COLLEGE_NAME = 'Kolhapur Institue of Technoloy';
+const COLLEGE_TAGLINE = 'Department Timetable';
+const COLLEGE_LOGO_TEXT = 'EF';
+
+let ttSelectedSubjects = [];
+
+function normalizeFacultyKey(name) {
+  return (name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function getTimetableIdentity(tt) {
+  return `${tt.year || ''}|${tt.div || ''}|${tt.sem || ''}|${tt.dept || ''}`;
+}
+
+function getTimetableHeaderMeta(tt) {
+  const activeDept = tt.dept || adminDepartment || 'Department';
+  return `${activeDept} | ${tt.year || ''} - Div ${tt.div || ''} | ${tt.sem || ''}`;
+}
+
+function blendHexWithWhite(hex, factor) {
+  const safeHex = (hex || '').replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(safeHex)) return hex || '#FFFFFF';
+  const r = parseInt(safeHex.slice(0, 2), 16);
+  const g = parseInt(safeHex.slice(2, 4), 16);
+  const b = parseInt(safeHex.slice(4, 6), 16);
+  const nr = Math.round(r + (255 - r) * factor);
+  const ng = Math.round(g + (255 - g) * factor);
+  const nb = Math.round(b + (255 - b) * factor);
+  const toHex = n => n.toString(16).padStart(2, '0');
+  return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
+}
+
+function buildTimetableTableHtml(grid, options = {}) {
+  const colorFade = typeof options.colorFade === 'number' ? options.colorFade : 0.45;
+  const emptyCellBg = blendHexWithWhite('#EAF2FF', 0.7);
+  const breakCellBg = blendHexWithWhite('#E5E7EB', 0.3);
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px;table-layout:fixed;border:2px solid #111;">
+    <thead>
+      <tr>
+        <th style="background:#0A0A0A;color:#fff;padding:12px 10px;text-align:center;font-size:11px;letter-spacing:1px;min-width:130px;border:1px solid #111;">Time</th>
+        ${DAYS.map(d => `<th style="background:#0A0A0A;color:#fff;padding:12px 8px;text-align:center;font-size:11px;letter-spacing:1px;border:1px solid #111;">${d}</th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  SLOTS.forEach((slot, si) => {
+    if (slot.type === 'break' || slot.type === 'lunch') {
+      html += `<tr>
+        <td style="padding:10px 12px;background:${breakCellBg};font-size:11px;color:#374151;font-weight:700;letter-spacing:1px;border:1px solid #111;text-align:center;">${slot.label}</td>
+        <td colspan="${DAYS.length}" style="background:${breakCellBg};text-align:center;font-size:11px;color:#111827;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid #111;">${slot.name}</td>
+      </tr>`;
+      return;
+    }
+
+    html += `<tr>
+      <td style="padding:10px 8px;font-size:11px;color:#374151;font-family:'Space Mono',monospace;white-space:nowrap;border:1px solid #111;text-align:center;font-weight:700;">${slot.label}</td>
+      ${DAYS.map(day => {
+        const cell = grid[day][si];
+        if (!cell) return `<td style="border:1px solid #111;padding:6px;min-width:110px;height:68px;background:${emptyCellBg};"></td>`;
+        if (cell.lab && cell.labPart === 2) return '';
+
+        if (cell.lab && cell.labPart === 1) {
+          const bg = blendHexWithWhite(cell.color, colorFade);
+          return `<td rowspan="2" style="border:1px solid #111;padding:6px;vertical-align:middle;min-width:110px;background:#fff;">
+            <div style="background:${bg};border-radius:8px;padding:8px;height:100%;min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid rgba(0,0,0,0.14);">
+              <div style="font-weight:700;font-size:12px;color:#0A0A0A;line-height:1.2;">${cell.name}</div>
+              <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || 'Faculty: -'}</div>
+              <div style="font-size:10px;color:#1D4ED8;font-weight:700;margin-top:2px;">LAB (DOUBLE SLOT)</div>
+            </div>
+          </td>`;
+        }
+
+        const bg = blendHexWithWhite(cell.color, colorFade);
+        return `<td style="border:1px solid #111;padding:6px;vertical-align:top;min-width:110px;height:68px;background:#fff;">
+          <div style="background:${bg};border-radius:8px;padding:8px;line-height:1.45;border:1px solid rgba(0,0,0,0.14);height:100%;">
+            <div style="font-weight:700;font-size:12px;color:#0A0A0A;">${cell.name}</div>
+            <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || 'Faculty: -'}</div>
+          </div>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildTimetableLayoutHtml(tt, options = {}) {
+  return `
+    <div class="tt-print-layout" style="background:#fff;border:2px solid #111;border-radius:0;padding:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #111;padding:12px 14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:56px;height:56px;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:1px;">${COLLEGE_LOGO_TEXT}</div>
+          <div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;">${COLLEGE_NAME}</div>
+            <div style="font-size:12px;color:#374151;font-weight:600;">${COLLEGE_TAGLINE}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:15px;font-weight:800;letter-spacing:.4px;">CLASS TIMETABLE</div>
+          <div style="font-size:12px;color:#374151;font-weight:600;">${getTimetableHeaderMeta(tt)}</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">${buildTimetableTableHtml(tt.grid, options)}</div>
+    </div>
+  `;
+}
+
+function renderTimetable(tt) {
+  document.getElementById('ttResultTitle').textContent = `${tt.year} - Div ${tt.div} Timetable`;
+  document.getElementById('ttResultSub').textContent = `${tt.sem} | ${tt.dept}`;
+  document.getElementById('ttGridWrap').innerHTML = buildTimetableLayoutHtml(tt);
+}
+
+function showTimetableWarning(message) {
+  const el = document.getElementById('ttWarning');
+  if (!el) return;
+  if (!message) {
+    el.style.display = 'none';
+    el.textContent = '';
+    return;
+  }
+  el.textContent = message;
+  el.style.display = 'block';
+}
+
+function showGenerator() {
+  showPage('timetables');
+  syncTimetableDepartmentField();
+  document.getElementById('ttSetup').style.display = 'block';
+  document.getElementById('ttAssign').style.display = 'none';
+  document.getElementById('ttResult').style.display = 'none';
+}
+
+function loadSubjectsForTT() {
+  const year = document.getElementById('ttYear').value;
+  const div  = document.getElementById('ttDiv').value;
+  const sem  = document.getElementById('ttSem').value;
+  const dept = adminDepartment || document.getElementById('ttDept').value;
+  if (!year || !div || !sem || !dept) { alert('Please fill all fields!'); return; }
+
+  // filter subjects matching this div/year/sem and department
+  const filtered = getVisibleSubjects().filter(s =>
+    (!s.year || s.year === year) &&
+    (!s.div  || s.div  === div)  &&
+    (!s.sem  || s.sem  === sem)
+  );
+
+  const list = document.getElementById('ttSubjectList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No subjects found for ${year} - Div ${div} - ${sem}. Please add subjects with matching Year, Division and Semester.</div></div>`;
+    document.getElementById('ttAssign').style.display = 'block';
+    return;
+  }
+
+  list.innerHTML = filtered.map((s,i) => `
+    <div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr;gap:12px;align-items:center;padding:12px;background:#F7F9FC;border-radius:12px;margin-bottom:8px;">
+      <input type="checkbox" id="ttSub_${s.id}" value="${s.id}" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--sky);">
+      <div>
+        <div style="font-weight:600;font-size:14px;">${s.name}</div>
+        <div style="font-size:11px;color:var(--gray);">${s.code || ''} · ${s.type} · ${s.grades} lec/week</div>
+      </div>
+      <select id="ttFac_${s.id}" style="padding:8px 12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+        <option value="">Assign Faculty</option>
+        ${getVisibleFaculty().map(f => `<option value="${f.name}" ${f.name===s.faculty?'selected':''}>${f.name}</option>`).join('')}
+      </select>
+      <span class="pill pill-purple">${s.grades} per week</span>
+    </div>
+  `).join('');
+
+  document.getElementById('ttAssign').style.display = 'block';
+  document.getElementById('ttAssign').scrollIntoView({ behavior:'smooth' });
+}
+
+function generateTimetable() {
+  const year = document.getElementById('ttYear').value;
+  const div  = document.getElementById('ttDiv').value;
+  const sem  = document.getElementById('ttSem').value;
+  const dept = adminDepartment || document.getElementById('ttDept').value;
+
+  // get selected subjects
+  const selected = getVisibleSubjects().filter(s => {
+    const cb = document.getElementById('ttSub_' + s.id);
+    return cb && cb.checked;
+  }).map(s => ({
+    ...s,
+    assignedFaculty: document.getElementById('ttFac_' + s.id)?.value || s.faculty
+  }));
+
+  if (selected.length === 0) { alert('Please select at least one subject!'); return; }
+
+  // ── SLOT HELPERS ──────────────────────────────────────────────
+  const lecSlots = SLOTS.map((s,i) => s.type === 'lec' ? i : -1).filter(i => i !== -1);
+  const afternoonLecSlots = SLOTS.map((s,i) => (s.type === 'lec' && s.period === 'afternoon') ? i : -1).filter(i => i !== -1);
+  const mdmEndSlots = [...afternoonLecSlots].reverse();
+
+  // Morning lec slots (before lunch) and afternoon lec slots (after lunch)
+  // Truly consecutive pairs (adjacent row indices, no break between)
+  const consecutivePairs = [];
+  for (let i = 0; i < lecSlots.length - 1; i++) {
+    if (lecSlots[i+1] === lecSlots[i] + 1) consecutivePairs.push([lecSlots[i], lecSlots[i+1]]);
+  }
+  // Morning-only and afternoon-only pairs for lab placement
+  const morningPairs   = consecutivePairs.filter(([s1]) => SLOTS[s1].period === 'morning');
+  const afternoonPairs = consecutivePairs.filter(([s1]) => SLOTS[s1].period === 'afternoon');
+
+  const lecSlotsEndFirst = [...lecSlots].reverse();
+
+  // ── BUILD GRID ────────────────────────────────────────────────
+  const grid = {};
+  DAYS.forEach(d => { grid[d] = {}; SLOTS.forEach((_,si) => { grid[d][si] = null; }); });
+
+  // ── FACULTY CLASH DETECTION ───────────────────────────────────
+  // Build a Set of "facultyName|day|slotIndex" already committed in
+  // other saved timetables so we never double-book a faculty member.
+  const savedTTs = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  // Exclude the timetable for the same year/div/sem (we are replacing it)
+  const currentIdentity = getTimetableIdentity({ year, div, sem, dept });
+  const otherTTs = savedTTs.filter(t => getTimetableIdentity(t) !== currentIdentity);
+  const sameYearDivTTs = otherTTs.filter(t => t.year === year && (t.dept || '') === dept);
+
+  // For MDM subjects: align slot timing across all divisions of the same year/department.
+  // Example: if SY Div A has MDM at Tue last slot, SY Div B/C should also get MDM at Tue last slot.
+  const mdmAnchorKeys = new Set();
+  sameYearDivTTs.forEach(tt => {
+    if (!tt.grid) return;
+    Object.entries(tt.grid).forEach(([day, slots]) => {
+      Object.entries(slots).forEach(([si, cell]) => {
+        if (!cell || cell.lab) return;
+        if ((cell.name || '').toUpperCase().includes('MDM')) {
+          mdmAnchorKeys.add(`${day}|${si}`);
+        }
+      });
+    });
+  });
+  const mdmAnchorSlots = Array.from(mdmAnchorKeys).map(key => {
+    const [day, si] = key.split('|');
+    return { day, si: Number(si) };
+  });
+  const mdmAnchorSlotSet = new Set(mdmAnchorSlots.map(a => `${a.day}|${a.si}`));
+  const hasMDMInSelection = selected.some(s => (s.name || '').toUpperCase().includes('MDM') && s.type !== 'Lab');
+  const bookedSlots = new Set();
+  otherTTs.forEach(tt => {
+    if (!tt.grid) return;
+    Object.entries(tt.grid).forEach(([day, slots]) => {
+      Object.entries(slots).forEach(([si, cell]) => {
+        if (cell && cell.assignedFaculty) {
+          const facultyKey = normalizeFacultyKey(cell.assignedFaculty);
+          if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+        }
+      });
+    });
+  });
+
+  // isFacultyFree: returns true if the faculty member has no commitment
+  // at (day, slotIndex) in either saved timetables OR the current grid.
+  function isFacultyFree(facultyName, day, si) {
+    const facultyKey = normalizeFacultyKey(facultyName);
+    if (!facultyKey) return true;
+    // Check saved timetables
+    if (bookedSlots.has(facultyKey + '|' + day + '|' + si)) return false;
+    // Check current grid being built
+    const cell = grid[day][si];
+    if (cell && normalizeFacultyKey(cell.assignedFaculty) === facultyKey) return false;
+    return true;
+  }
+
+  // ── HELPERS ───────────────────────────────────────────────────
+  // Count how many lab sessions are placed on a day (morning vs afternoon)
+  function labsOnDay(day, period) {
+    return Object.entries(grid[day])
+      .filter(([si, c]) => c && c.lab && c.labPart === 1 && SLOTS[si].period === period)
+      .length;
+  }
+  function totalLabsOnDay(day) {
+    return Object.values(grid[day]).filter(c => c && c.lab && c.labPart === 1).length;
+  }
+  // Balanced load per day: lab part-1 counts as 2 periods, normal lecture as 1.
+  function dayLoad(day) {
+    let load = 0;
+    Object.values(grid[day]).forEach(c => {
+      if (!c) return;
+      if (c.lab && c.labPart === 2) return;
+      load += c.lab ? 2 : 1;
+    });
+    return load;
+  }
+  // Check if subject already appears on this day (lecture or lab)
+  function subOnDay(day, subjectKey) {
+    return Object.values(grid[day]).some(c => c && getSubjectIdentityKey(c) === subjectKey);
+  }
+
+  // ── SORT: Labs first, then MDM, then other lectures ──
+  // This ensures MDM slots are secured before normal lectures fill them.
+  const sortedSelected = [...selected].sort((a, b) => {
+    const rank = s => s.type === 'Lab' ? 0 : ((s.name || '').toUpperCase().includes('MDM') ? 1 : 2);
+    return rank(a) - rank(b);
+  });
+  const unplacedSubjects = [];
+
+  // ── PLACE EACH SUBJECT ────────────────────────────────────────
+  sortedSelected.forEach((sub, colorIdx) => {
+    const origIdx = selected.findIndex(s => s.id === sub.id);
+    const color   = CELL_COLORS[(origIdx >= 0 ? origIdx : colorIdx) % CELL_COLORS.length];
+    const needed  = sub.grades;
+    const subjectKey = getSubjectIdentityKey(sub);
+    let placed    = 0;
+
+    // Prefer days with lighter current load so timetable is distributed.
+    const shuffledDays = [...DAYS].sort((a, b) => dayLoad(a) - dayLoad(b) || (Math.random() - 0.5));
+
+    for (const day of shuffledDays) {
+      if (placed >= needed) break;
+
+      // Never place same subject twice on same day
+      if (subOnDay(day, subjectKey)) continue;
+
+      if (sub.type === 'Lab') {
+        if (totalLabsOnDay(day) >= 2) continue;
+        // Rule: max 1 lab before lunch + max 1 lab after lunch = max 2 labs/day
+        // But same subject lab must NOT appear twice on same day
+        // Try to find a free consecutive pair — prefer afternoon, else morning
+        const tryPairs = [...afternoonPairs, ...morningPairs];
+        for (const [s1, s2] of tryPairs) {
+          // Keep MDM anchor slots reserved so labs cannot block strict MDM timing.
+          if (hasMDMInSelection && (mdmAnchorSlotSet.has(`${day}|${s1}`) || mdmAnchorSlotSet.has(`${day}|${s2}`))) continue;
+          const period = SLOTS[s1].period;
+          // Only 1 lab allowed per period per day
+          if (labsOnDay(day, period) >= 1) continue;
+          if (!grid[day][s1] && !grid[day][s2] &&
+              isFacultyFree(sub.assignedFaculty, day, s1) &&
+              isFacultyFree(sub.assignedFaculty, day, s2)) {
+            grid[day][s1] = { ...sub, color, lab: true, labPart: 1 };
+            grid[day][s2] = { ...sub, color, lab: true, labPart: 2 };
+            // Mark these slots as booked in the current grid's faculty tracker
+            const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+            if (facultyKey) {
+              bookedSlots.add(facultyKey + '|' + day + '|' + s1);
+              bookedSlots.add(facultyKey + '|' + day + '|' + s2);
+            }
+            placed++;
+            break;
+          }
+        }
+      } else {
+        // MDM rules:
+        // 1) MDM is a normal lecture (not lab)
+        // 2) Prefer end-of-day slots
+        // 3) If same-year/same-department divisions already have MDM slots,
+        //    align this division to the same day/time slots.
+        const isMDM  = sub.name && sub.name.toUpperCase().includes('MDM');
+        const order  = isMDM ? mdmEndSlots : lecSlots;
+
+        if (isMDM && mdmAnchorSlots.length > 0) {
+          for (const anchor of mdmAnchorSlots) {
+            if (placed >= needed) break;
+            if (anchor.day !== day) continue;
+            if (subOnDay(day, subjectKey)) continue;
+            // Keep faculty clash rules strict for every lecture type, including MDM.
+            if (!grid[day][anchor.si] && isFacultyFree(sub.assignedFaculty, day, anchor.si)) {
+              grid[day][anchor.si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + anchor.si);
+              placed++;
+            }
+          }
+          continue;
+        }
+
+        for (const si of order) {
+          // When MDM anchors exist for this year/department, keep those slots reserved
+          // so other subjects cannot occupy them in this division.
+          if (!isMDM && hasMDMInSelection && mdmAnchorSlotSet.has(`${day}|${si}`)) continue;
+          if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
+            grid[day][si] = { ...sub, color };
+            const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+            if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+            placed++;
+            break;
+          }
+        }
+      }
+    }
+
+    // ── SECOND PASS: if still under quota, allow same subject on already-used days ──
+    if (placed < needed && sub.type !== 'Lab') {
+      const daysByLightLoad = [...DAYS].sort((a, b) => dayLoad(a) - dayLoad(b));
+      for (const day of daysByLightLoad) {
+        if (placed >= needed) break;
+        if (subOnDay(day, subjectKey)) continue;
+        const isMDM = sub.name && sub.name.toUpperCase().includes('MDM');
+        const order = isMDM ? mdmEndSlots : lecSlots;
+
+        if (isMDM && mdmAnchorSlots.length > 0) {
+          for (const anchor of mdmAnchorSlots) {
+            if (placed >= needed) break;
+            if (anchor.day !== day) continue;
+            if (subOnDay(day, subjectKey)) continue;
+            if (!grid[day][anchor.si] && isFacultyFree(sub.assignedFaculty, day, anchor.si)) {
+              grid[day][anchor.si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + anchor.si);
+              placed++;
+            }
+          }
+          continue;
+        }
+
+        for (const si of order) {
+          if (!isMDM && hasMDMInSelection && mdmAnchorSlotSet.has(`${day}|${si}`)) continue;
+          if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
+            grid[day][si] = { ...sub, color };
+            const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+            if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+            placed++;
+            break;
+          }
+        }
+      }
+    }
+
+    if (placed < needed) {
+      unplacedSubjects.push(`${sub.name} (${placed}/${needed})`);
+    }
+  });
+
+  // Strict rule: if MDM anchors already exist for this year/department, this timetable's
+  // MDM must follow only those exact slots. If it cannot, report explicitly.
+  if (hasMDMInSelection && mdmAnchorSlots.length > 0) {
+    const mdmSubject = selected.find(s => (s.name || '').toUpperCase().includes('MDM') && s.type !== 'Lab');
+    if (mdmSubject) {
+      const mdmNameKey = (mdmSubject.name || '').toUpperCase();
+      const placedMDMAnchors = mdmAnchorSlots.filter(anchor => {
+        const c = grid[anchor.day] && grid[anchor.day][anchor.si];
+        return c && !c.lab && (c.name || '').toUpperCase() === mdmNameKey;
+      }).length;
+      const required = Number(mdmSubject.grades) || 0;
+      if (placedMDMAnchors < required) {
+        const detail = `${mdmSubject.name} (${placedMDMAnchors}/${required}) - strict same-time rule`;
+        if (!unplacedSubjects.includes(detail)) unplacedSubjects.push(detail);
+      }
+    }
+  }
+
+  // Render grid
+  renderTimetable({ year, div, sem, dept, grid });
+  document.getElementById('ttResult').style.display = 'block';
+  document.getElementById('ttResult').scrollIntoView({ behavior:'smooth' });
+
+  if (unplacedSubjects.length > 0) {
+    showTimetableWarning(`Some subjects are only partially scheduled due to faculty clash rules or limited slots: ${unplacedSubjects.join(', ')}`);
+  } else {
+    showTimetableWarning('');
+  }
+
+  // store current tt for saving
+  window._currentTT = { year, div, sem, dept, grid, selected, timestamp: Date.now() };
+}
+
+function saveTimetable() {
+  if (!window._currentTT) return;
+  const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  // check if already exists for same class identity
+  const currentIdentity = getTimetableIdentity(window._currentTT);
+  const existIdx = tts.findIndex(t => getTimetableIdentity(t) === currentIdentity);
+  if (existIdx !== -1) { tts[existIdx] = window._currentTT; }
+  else { tts.push(window._currentTT); }
+  localStorage.setItem('ef_timetables', JSON.stringify(tts));
+  renderSavedTT();
+  alert('✅ Timetable saved successfully!');
+  renderAll();
+}
+
+function renderSavedTT() {
+  const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  const el  = document.getElementById('savedTTList');
+  if (tts.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">No timetables saved yet.</div></div>';
+    return;
+  }
+  el.innerHTML = tts.map((tt,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#F7F9FC;border-radius:12px;margin-bottom:8px;">
+      <div>
+        <div style="font-weight:600;font-size:14px;">${tt.year} - Div ${tt.div}</div>
+        <div style="font-size:12px;color:var(--gray);">${tt.sem} · ${tt.dept}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="viewSavedTT(${i})" style="background:#E0F4FF;color:#0284C7;border:none;padding:8px 16px;border-radius:100px;font-size:12px;cursor:pointer;font-weight:600;">View</button>
+        <button onclick="deleteSavedTT(${i})" style="background:#FEE2E2;color:#991B1B;border:none;padding:8px 16px;border-radius:100px;font-size:12px;cursor:pointer;font-weight:600;">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewSavedTT(idx) {
+  const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  window._currentTT = tts[idx];
+  renderTimetable(tts[idx]);
+  showTimetableWarning('');
+  document.getElementById('ttSetup').style.display  = 'none';
+  document.getElementById('ttAssign').style.display = 'none';
+  document.getElementById('ttResult').style.display = 'block';
+  document.getElementById('ttResult').scrollIntoView({ behavior:'smooth' });
+}
+
+function deleteSavedTT(idx) {
+  if (!confirm('Delete this timetable?')) return;
+  const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  tts.splice(idx, 1);
+  localStorage.setItem('ef_timetables', JSON.stringify(tts));
+  renderSavedTT(); renderAll();
+}
+
+function resetGenerator() {
+  document.getElementById('ttResult').style.display = 'none';
+  document.getElementById('ttSetup').style.display  = 'block';
+  document.getElementById('ttAssign').style.display = 'none';
+  showTimetableWarning('');
+  syncTimetableDepartmentField();
+}
+
+function printTT() {
+  if (!window._currentTT) {
+    alert('Please generate or open a timetable first.');
+    return;
+  }
+  const content = buildTimetableLayoutHtml(window._currentTT, { colorFade: 0.55 });
+  const title   = `${window._currentTT.year} - Div ${window._currentTT.div} Timetable`;
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>${title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'DM Sans',sans-serif;padding:20px;color:#111;background:#fff;}
+    .tt-print-layout{page-break-inside:avoid;}
+    @page{size:A4 landscape;margin:12mm;}
+  </style>
+  </head><body>${content}</body></html>`);
+  w.document.close(); w.print();
+}
+
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  localStorage.removeItem('name');
+  localStorage.removeItem('department');
+  window.location.href = 'index.html';
+}
+
+// ========== INIT ==========
+syncFacultyDepartmentFields();
+syncTimetableDepartmentField();
+if (dedupeSubjects() > 0) saveData();
+renderAll();
+renderSavedTT();
+</script>
+</body>
+</html>

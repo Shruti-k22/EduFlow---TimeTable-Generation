@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduFlow - Student Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box} :root{--sky:#38BDF8;--sky-light:#E0F4FF;--black:#0A0A0A;--gray:#6B7280;--red:#E63946;--sidebar:260px}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:var(--black)} #sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--black);padding:0 0 24px;display:flex;flex-direction:column} #main{margin-left:var(--sidebar);padding:32px}
+.brand{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:12px;align-items:center}.brand-badge,.avatar{width:40px;height:40px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;color:var(--black);font-family:'Bebas Neue',sans-serif}.brand-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff}.brand-sub,.user-role,.section{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.section{padding:20px 16px 8px;color:rgba(255,255,255,.3)} .nav-item{display:flex;gap:12px;align-items:center;margin:2px 8px;padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.65);cursor:pointer}.nav-item.active,.nav-item:hover{background:var(--sky);color:var(--black)} .nav-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center}
+.userbox{margin-top:auto;padding:0 8px}.user{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:8px}.user-name{font-size:13px;font-weight:600;color:#fff}.logout{padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.4);cursor:pointer}.logout:hover{background:rgba(230,57,70,.15);color:var(--red)}
+.page{display:none}.page.active{display:block}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:28px}.title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px}.sub{font-size:13px;color:var(--gray);margin-top:2px}.date{background:#fff;border:1px solid #E5E7EB;padding:8px 16px;border-radius:100px;font:12px 'Space Mono',monospace;color:var(--gray)}
+.stats,.grid3,.grid2{display:grid;gap:16px;margin-bottom:28px}.stats{grid-template-columns:repeat(4,1fr)}.grid3{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1.15fr .85fr}
+.card,.action{background:#fff;border:1px solid #F0F0F0;border-radius:20px;padding:24px}.stat{position:relative;overflow:hidden}.icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}.num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1}.label{font-size:13px;color:var(--gray)}.water{position:absolute;right:-16px;bottom:-16px;font:80px 'Bebas Neue',sans-serif;opacity:.06}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.head-title{font-size:15px;font-weight:600}.chip,.btn,.ghost{border:none;border-radius:100px;font-family:'DM Sans',sans-serif}.chip{padding:8px 14px;background:var(--sky-light);color:#0284C7;font-size:12px;font-weight:500}.btn{padding:14px 18px;background:var(--black);color:#fff;font-size:14px;font-weight:600;cursor:pointer}.btn:hover{background:var(--sky);color:var(--black)}.ghost{padding:14px 18px;background:#F4F4F4;font-size:14px;font-weight:600;cursor:pointer}
+.action{cursor:pointer;transition:.2s}.action:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08)}.action-title{font-size:15px;font-weight:600}.action-copy{font-size:12px;color:var(--gray);line-height:1.6}
+.field{margin-bottom:16px}.field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F7F9FC;font:14px 'DM Sans',sans-serif;outline:none}.field textarea{min-height:96px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
+.form2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.pills,.stack{display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600}.blue{background:var(--sky-light);color:#0284C7}.green{background:#D1FAE5;color:#065F46}.yellow{background:#FEF9C3;color:#854D0E}.purple{background:#EDE9FE;color:#5B21B6}.pink{background:#FCE7F3;color:#9D174D}
+.list{display:grid;gap:12px}.item{border:1px solid #F0F0F0;border-radius:16px;padding:16px}.item-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:8px}.item-title{font-size:15px;font-weight:700}.item-sub,.item-note,.empty{font-size:12px;color:var(--gray);line-height:1.6}.empty{padding:24px 0;text-align:center}
+@media (max-width:1000px){.stats,.grid3,.grid2,.form2{grid-template-columns:1fr 1fr}} @media (max-width:820px){#sidebar{position:static;width:100%;height:auto} #main{margin-left:0;padding:20px} .stats,.grid3,.grid2,.form2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div class="brand"><div class="brand-badge">EF</div><div><div class="brand-title">EduFlow</div><div class="brand-sub">Student Planner</div></div></div>
+  <div class="section">Planner</div>
+  <a class="nav-item active" onclick="showPage('dashboard',this)"><div class="nav-icon">📊</div>Dashboard</a>
+  <a class="nav-item" onclick="showPage('planner',this)"><div class="nav-icon">📝</div>Study Planner</a>
+  <a class="nav-item" onclick="showPage('schedule',this)"><div class="nav-icon">📅</div>My Schedule</a>
+  <div class="userbox">
+    <div class="user"><div class="avatar" id="avatar">S</div><div><div class="user-name" id="sname">Student</div><div class="user-role">Student</div></div></div>
+    <div class="logout" onclick="logout()">🚪 Logout</div>
+  </div>
+</div>
+<div id="main">
+  <div class="page active" id="page-dashboard">
+    <div class="top"><div><div class="title">Student Dashboard</div><div class="sub">Personal study planning only. No faculty timetable or division data is shown here.</div></div><div class="date" id="date">-</div></div>
+    <div class="stats">
+      <div class="card stat"><div class="icon" style="background:#E0F4FF">📘</div><div class="num" id="s1">0</div><div class="label">Study Subjects</div><div class="water">SUB</div></div>
+      <div class="card stat"><div class="icon" style="background:#D1FAE5">🧠</div><div class="num" id="s2">0</div><div class="label">Planned Sessions</div><div class="water">PLAN</div></div>
+      <div class="card stat"><div class="icon" style="background:#FEF9C3">⏳</div><div class="num" id="s3">0</div><div class="label">Hours Planned</div><div class="water">HRS</div></div>
+      <div class="card stat"><div class="icon" style="background:#EDE9FE">🎯</div><div class="num" id="s4">0</div><div class="label">Weekly Goals</div><div class="water">GOAL</div></div>
+    </div>
+    <div class="grid3">
+      <div class="action" onclick="showPage('planner',document.querySelectorAll('.nav-item')[1])"><div class="action-title">Add Study Session</div><div class="action-copy">Create your own study slots for revision, projects, or assignments.</div></div>
+      <div class="action" onclick="showPage('schedule',document.querySelectorAll('.nav-item')[2])"><div class="action-title">Open My Schedule</div><div class="action-copy">Review your saved plan for the week in one personal view.</div></div>
+      <div class="action"><div class="action-title">Private Workspace</div><div class="action-copy">This area keeps faculty information hidden and only stores your own plan.</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="head"><div class="head-title">Upcoming Study Sessions</div></div><div id="preview"></div></div>
+      <div class="card"><div class="head"><div class="head-title">Focus Areas</div></div><div class="stack" id="focus"></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-planner">
+    <div class="top"><div><div class="title">Create Personal Study Plan</div><div class="sub">Build your own private routine for studying.</div></div></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="head"><div class="head-title">New Study Session</div></div>
+        <div class="form2">
+          <div class="field"><label>Subject / Topic</label><input id="subject" type="text" placeholder="e.g. Data Structures revision"/></div>
+          <div class="field"><label>Goal</label><input id="goal" type="text" placeholder="e.g. Finish Unit 3 notes"/></div>
+          <div class="field"><label>Day</label><select id="day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
+          <div class="field"><label>Time Slot</label><input id="slot" type="text" placeholder="e.g. 7:00 PM - 8:30 PM"/></div>
+          <div class="field"><label>Duration (hours)</label><input id="hours" type="number" min="0.5" step="0.5" placeholder="e.g. 1.5"/></div>
+          <div class="field"><label>Priority</label><select id="priority"><option>High</option><option>Medium</option><option>Low</option></select></div>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="notes" placeholder="Optional checklist or reminder"></textarea></div>
+        <div class="pills"><button class="btn" onclick="savePlan()">Save Study Session</button><button class="ghost" onclick="resetForm()">Clear</button></div>
+      </div>
+      <div class="card"><div class="head"><div class="head-title">Planner Rules</div></div><div class="list"><div class="item"><div class="item-title">Only personal plans</div><div class="item-note">You can create study sessions for exams, assignments, or projects, but not access teacher timetable details.</div></div><div class="item"><div class="item-title">Goal-based routine</div><div class="item-note">Each study block can carry a goal so you know exactly what to complete.</div></div><div class="item"><div class="item-title">Flexible schedule</div><div class="item-note">Use the planner for daily revision, lab prep, project work, or reading sessions.</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-schedule">
+    <div class="top"><div><div class="title">My Study Schedule</div><div class="sub">All saved study sessions for your own routine.</div></div></div>
+    <div class="card"><div id="schedule"></div></div>
+  </div>
+</div>
+<script>
+const token=localStorage.getItem('token'),role=localStorage.getItem('role'),studentName=localStorage.getItem('name')||'Student';
+if(!token||role!=='Student'){window.location.href='index.html';}
+document.getElementById('sname').textContent=studentName;document.getElementById('avatar').textContent=studentName.charAt(0).toUpperCase();
+const n=new Date(),d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('date').textContent=`${d[n.getDay()]}, ${n.getDate()} ${m[n.getMonth()]} ${n.getFullYear()}`;
+const getPlans=()=>JSON.parse(localStorage.getItem('ef_study_plans')||'[]').filter(p=>p.studentName===studentName);
+function showPage(page,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById(`page-${page}`).classList.add('active');if(el)el.classList.add('active');renderAll();}
+function renderDashboard(){const pp=getPlans(),subjects=[...new Set(pp.map(p=>p.subject).filter(Boolean))],hours=pp.reduce((sum,p)=>sum+(Number(p.hours)||0),0);document.getElementById('s1').textContent=subjects.length;document.getElementById('s2').textContent=pp.length;document.getElementById('s3').textContent=hours;document.getElementById('s4').textContent=pp.filter(p=>p.goal).length;document.getElementById('focus').innerHTML=subjects.length?subjects.map(s=>`<span class="pill blue">${s}</span>`).join(''):'<div class="empty">Add subjects to build your focus stack.</div>';document.getElementById('preview').innerHTML=pp.length?`<div class="list">${pp.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5).map(p=>`<div class="item"><div class="item-top"><div><div class="item-title">${p.subject}</div><div class="item-sub">${p.goal||'Goal not added yet'}</div></div><span class="pill purple">${p.day} · ${p.slot}</span></div><div class="pills"><span class="pill green">${p.hours} hrs</span><span class="pill ${p.priority==='High'?'pink':p.priority==='Medium'?'yellow':'blue'}">${p.priority}</span></div><div class="item-note">${p.notes||'No note added.'}</div></div>`).join('')}</div>`:'<div class="empty">No study sessions saved yet.</div>';}
+function renderSchedule(){const pp=getPlans();document.getElementById('schedule').innerHTML=pp.length?`<div class="list">${pp.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>`<div class="item"><div class="item-top"><div><div class="item-title">${p.subject}</div><div class="item-sub">${p.goal||'Goal not added yet'}</div></div><span class="pill purple">${p.day} · ${p.slot}</span></div><div class="pills"><span class="pill green">${p.hours} hrs</span><span class="pill ${p.priority==='High'?'pink':p.priority==='Medium'?'yellow':'blue'}">${p.priority}</span></div><div class="item-note">${p.notes||'No note added.'}</div></div>`).join('')}</div>`:'<div class="empty">Your personal study schedule will appear here.</div>';}
+function savePlan(){const subject=document.getElementById('subject').value.trim(),goal=document.getElementById('goal').value.trim(),day=document.getElementById('day').value,slot=document.getElementById('slot').value.trim(),hours=document.getElementById('hours').value,priority=document.getElementById('priority').value,notes=document.getElementById('notes').value.trim();if(!subject||!slot||!hours){alert('Please enter subject, time slot, and duration.');return;} const all=JSON.parse(localStorage.getItem('ef_study_plans')||'[]');all.push({id:Date.now(),studentName,subject,goal,day,slot,hours:Number(hours),priority,notes,createdAt:new Date().toISOString()});localStorage.setItem('ef_study_plans',JSON.stringify(all));resetForm();renderAll();showPage('schedule',document.querySelectorAll('.nav-item')[2]);}
+function resetForm(){document.getElementById('subject').value='';document.getElementById('goal').value='';document.getElementById('slot').value='';document.getElementById('hours').value='';document.getElementById('notes').value='';document.getElementById('priority').value='High';document.getElementById('day').value='Monday';}
+function renderAll(){renderDashboard();renderSchedule();}
+function logout(){localStorage.removeItem('token');localStorage.removeItem('role');localStorage.removeItem('name');localStorage.removeItem('email');window.location.href='index.html';}
+renderAll();
+</script>
+</body>
+</html>
