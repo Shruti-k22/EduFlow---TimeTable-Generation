@@ -544,7 +544,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
             <option>A</option>
             <option>B</option>
             <option>C</option>
-            <option>D</option>
           </select>
         </div>
         <div class="fg">
@@ -653,7 +652,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
       <div class="fg"><label>Division</label>
         <select id="editSubDiv">
           <option value="">Select Division</option>
-          <option>A</option><option>B</option><option>C</option><option>D</option>
+          <option>A</option><option>B</option><option>C</option>
         </select>
       </div>
       <div class="fg"><label>Semester</label>
@@ -684,7 +683,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
     <div class="modal-title">Add Faculty</div>
     <div class="modal-sub">Fill in the faculty details below</div>
     <div class="fg"><label>Full Name</label><input type="text" id="facName" placeholder="Enter faculty name"/></div>
-    <div class="fg"><label>Email</label><input type="email" id="facEmail" placeholder="faculty@college.edu.in"/></div>
+    <div class="fg"><label>Email <span style="color:#E63946;font-size:11px;">* required for notifications</span></label><input type="email" id="facEmail" placeholder="faculty@college.edu.in" required/></div>
     <button class="btn-primary" onclick="addFaculty()">Add Faculty</button>
   </div>
 </div>
@@ -710,7 +709,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
       <div class="fg"><label>Division</label>
         <select id="subDiv">
           <option value="">Select Division</option>
-          <option>A</option><option>B</option><option>C</option><option>D</option>
+          <option>A</option><option>B</option><option>C</option>
         </select>
       </div>
       <div class="fg"><label>Semester</label>
@@ -915,12 +914,17 @@ function addFaculty() {
   const email = document.getElementById('facEmail').value.trim();
   if (!dept) { alert('Your department is missing. Please log in again.'); return; }
   if (!name) { alert('Please enter faculty name!'); return; }
+  if (!email) { alert('⚠️ Email is required! Faculty will not receive notifications without an email.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('⚠️ Please enter a valid email address.'); return; }
   if (isDuplicateFacultyName(name)) {
     alert('Faculty name already exists. Please enter a different name.');
     return;
   }
   faculty.push({ id: Date.now(), name, dept, email, status: 'Active' });
-  saveData(); renderAll(); closeModal('modalFaculty');
+  saveData();
+  // Sync faculty emails to backend for notifications
+  syncFacultyToBackend();
+  renderAll(); closeModal('modalFaculty');
   document.getElementById('facName').value = '';
   document.getElementById('facEmail').value = '';
 }
@@ -1130,7 +1134,7 @@ const SLOTS = [
   { label:'3:25 – 4:15',   type:'lec',   period: 'afternoon' },
 ];
 const CELL_COLORS = ['#E0F4FF','#FFB3C6','#B5EAD7','#FFF176','#C5B4E3','#FFDAB9','#D1FAE5','#FEE2E2'];
-const COLLEGE_NAME = 'Kolhapur Institue of Technoloy';
+const COLLEGE_NAME = "K.I.T's College of Engineering (Autonomous), Kolhapur";
 const COLLEGE_TAGLINE = 'Department Timetable';
 const COLLEGE_LOGO_TEXT = 'EF';
 
@@ -1163,14 +1167,17 @@ function blendHexWithWhite(hex, factor) {
 }
 
 function buildTimetableTableHtml(grid, options = {}) {
-  const colorFade = typeof options.colorFade === 'number' ? options.colorFade : 0.45;
-  const emptyCellBg = blendHexWithWhite('#EAF2FF', 0.7);
-  const breakCellBg = blendHexWithWhite('#E5E7EB', 0.3);
-  let html = `<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px;table-layout:fixed;border:2px solid #111;">
+  const colorFade  = typeof options.colorFade === 'number' ? options.colorFade : 0.45;
+  const printMode  = !!options.printMode;
+  const emptyCellBg = printMode ? '#fff' : blendHexWithWhite('#EAF2FF', 0.7);
+  const breakCellBg = printMode ? '#f0f0f0' : blendHexWithWhite('#E5E7EB', 0.3);
+  const border     = '1px solid #000';
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:${printMode?'11px':'12px'};${printMode?'':'min-width:780px;'}table-layout:fixed;border:2px solid #000;">
     <thead>
       <tr>
-        <th style="background:#0A0A0A;color:#fff;padding:12px 10px;text-align:center;font-size:11px;letter-spacing:1px;min-width:130px;border:1px solid #111;">Time</th>
-        ${DAYS.map(d => `<th style="background:#0A0A0A;color:#fff;padding:12px 8px;text-align:center;font-size:11px;letter-spacing:1px;border:1px solid #111;">${d}</th>`).join('')}
+        <th style="background:${printMode?'#fff':'#0A0A0A'};color:${printMode?'#000':'#fff'};padding:${printMode?'6px 8px':'12px 10px'};text-align:center;font-size:11px;letter-spacing:1px;min-width:${printMode?'90px':'130px'};border:${border};">Time</th>
+        ${DAYS.map(d => `<th style="background:${printMode?'#fff':'#0A0A0A'};color:${printMode?'#000':'#fff'};padding:${printMode?'6px 4px':'12px 8px'};text-align:center;font-size:11px;letter-spacing:1px;border:${border};">${d}</th>`).join('')}
       </tr>
     </thead>
     <tbody>`;
@@ -1178,35 +1185,36 @@ function buildTimetableTableHtml(grid, options = {}) {
   SLOTS.forEach((slot, si) => {
     if (slot.type === 'break' || slot.type === 'lunch') {
       html += `<tr>
-        <td style="padding:10px 12px;background:${breakCellBg};font-size:11px;color:#374151;font-weight:700;letter-spacing:1px;border:1px solid #111;text-align:center;">${slot.label}</td>
-        <td colspan="${DAYS.length}" style="background:${breakCellBg};text-align:center;font-size:11px;color:#111827;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid #111;">${slot.name}</td>
+        <td style="padding:${printMode?'4px 6px':'10px 12px'};background:${breakCellBg};font-size:10px;color:#000;font-weight:bold;letter-spacing:1px;border:${border};text-align:center;">${slot.label}</td>
+        <td colspan="${DAYS.length}" style="background:${breakCellBg};text-align:center;font-size:${printMode?'10px':'11px'};color:#000;font-weight:bold;letter-spacing:2px;text-transform:uppercase;border:${border};">${slot.name}</td>
       </tr>`;
       return;
     }
 
     html += `<tr>
-      <td style="padding:10px 8px;font-size:11px;color:#374151;font-family:'Space Mono',monospace;white-space:nowrap;border:1px solid #111;text-align:center;font-weight:700;">${slot.label}</td>
+      <td style="padding:${printMode?'4px 6px':'10px 8px'};font-size:10px;color:#000;${printMode?'':'font-family:\'Space Mono\',monospace;'}white-space:nowrap;border:${border};text-align:center;font-weight:bold;">${slot.label}</td>
       ${DAYS.map(day => {
         const cell = grid[day][si];
-        if (!cell) return `<td style="border:1px solid #111;padding:6px;min-width:110px;height:68px;background:${emptyCellBg};"></td>`;
+        if (!cell) return `<td style="border:${border};padding:4px;min-width:${printMode?'80px':'110px'};height:${printMode?'48px':'68px'};background:${emptyCellBg};"></td>`;
         if (cell.lab && cell.labPart === 2) return '';
 
+        const bg = printMode ? '#fff' : blendHexWithWhite(cell.color, colorFade);
+        const cellBorder = printMode ? '' : `border:1px solid rgba(0,0,0,0.14);`;
+
         if (cell.lab && cell.labPart === 1) {
-          const bg = blendHexWithWhite(cell.color, colorFade);
-          return `<td rowspan="2" style="border:1px solid #111;padding:6px;vertical-align:middle;min-width:110px;background:#fff;">
-            <div style="background:${bg};border-radius:8px;padding:8px;height:100%;min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid rgba(0,0,0,0.14);">
-              <div style="font-weight:700;font-size:12px;color:#0A0A0A;line-height:1.2;">${cell.name}</div>
-              <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || 'Faculty: -'}</div>
-              <div style="font-size:10px;color:#1D4ED8;font-weight:700;margin-top:2px;">LAB (DOUBLE SLOT)</div>
+          return `<td rowspan="2" style="border:${border};padding:${printMode?'4px':'6px'};vertical-align:middle;min-width:${printMode?'80px':'110px'};background:#fff;">
+            <div style="background:${bg};border-radius:${printMode?'0':'8px'};padding:${printMode?'4px':'8px'};height:100%;min-height:${printMode?'80px':'120px'};display:flex;flex-direction:column;justify-content:center;gap:3px;${cellBorder}">
+              <div style="font-weight:bold;font-size:${printMode?'10px':'12px'};color:#000;line-height:1.2;">${cell.name}</div>
+              <div style="font-size:9px;color:#222;">(${cell.assignedFaculty || '-'})</div>
+              <div style="font-size:9px;color:#000;font-weight:bold;margin-top:2px;">Lab ${printMode?'(Double Slot)':'(DOUBLE SLOT)'}</div>
             </div>
           </td>`;
         }
 
-        const bg = blendHexWithWhite(cell.color, colorFade);
-        return `<td style="border:1px solid #111;padding:6px;vertical-align:top;min-width:110px;height:68px;background:#fff;">
-          <div style="background:${bg};border-radius:8px;padding:8px;line-height:1.45;border:1px solid rgba(0,0,0,0.14);height:100%;">
-            <div style="font-weight:700;font-size:12px;color:#0A0A0A;">${cell.name}</div>
-            <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || 'Faculty: -'}</div>
+        return `<td style="border:${border};padding:${printMode?'4px':'6px'};vertical-align:middle;min-width:${printMode?'80px':'110px'};height:${printMode?'48px':'68px'};background:#fff;">
+          <div style="background:${bg};border-radius:${printMode?'0':'8px'};padding:${printMode?'4px':'8px'};line-height:1.4;${cellBorder}height:100%;display:flex;flex-direction:column;justify-content:center;gap:2px;">
+            <div style="font-weight:bold;font-size:${printMode?'10px':'12px'};color:#000;">${cell.name}</div>
+            <div style="font-size:9px;color:#222;">(${cell.assignedFaculty || '-'})</div>
           </div>
         </td>`;
       }).join('')}
@@ -1218,22 +1226,46 @@ function buildTimetableTableHtml(grid, options = {}) {
 }
 
 function buildTimetableLayoutHtml(tt, options = {}) {
+  const dept     = tt.dept || adminDepartment || 'Department';
+  const hodName  = localStorage.getItem('name') || 'HOD';
+  const year     = tt.year || '';
+  const div      = tt.div  || '';
+  const sem      = tt.sem  || '';
+  // Academic year: derive from current year
+  const now      = new Date();
+  const yr       = now.getFullYear();
+  const acYear   = now.getMonth() >= 6 ? `${yr}-${String(yr+1).slice(2)}` : `${yr-1}-${String(yr).slice(2)}`;
+  const divLabel = `${year} ${dept.replace('CSE - ','').replace('CSE-','')} - Div ${div}`;
+
   return `
-    <div class="tt-print-layout" style="background:#fff;border:2px solid #111;border-radius:0;padding:14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #111;padding:12px 14px;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:56px;height:56px;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:1px;">${COLLEGE_LOGO_TEXT}</div>
-          <div>
-            <div style="font-size:18px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;">${COLLEGE_NAME}</div>
-            <div style="font-size:12px;color:#374151;font-weight:600;">${COLLEGE_TAGLINE}</div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:15px;font-weight:800;letter-spacing:.4px;">CLASS TIMETABLE</div>
-          <div style="font-size:12px;color:#374151;font-weight:600;">${getTimetableHeaderMeta(tt)}</div>
+    <div class="tt-print-layout" style="font-family:'Times New Roman',serif;background:#fff;border:2px solid #000;width:100%;box-sizing:border-box;">
+
+      <!-- ── HEADER ── -->
+      <div style="border-bottom:2px solid #000;padding:10px 14px;text-align:center;">
+        <div style="font-size:14px;font-weight:bold;line-height:1.6;">${COLLEGE_NAME}</div>
+        <div style="font-size:12px;font-weight:bold;">Department of ${dept}</div>
+        <div style="font-size:12px;font-weight:bold;">Time Table A.Y. ${acYear}</div>
+      </div>
+
+      <!-- ── CLASS TITLE BAR ── -->
+      <div style="border-bottom:2px solid #000;padding:6px 14px;text-align:center;font-size:13px;font-weight:bold;letter-spacing:0.5px;">
+        ${divLabel}
+      </div>
+
+      <!-- ── TIMETABLE GRID ── -->
+      <div style="overflow-x:auto;">
+        ${buildTimetableTableHtml(tt.grid, options)}
+      </div>
+
+      <!-- ── FOOTER: HOD SIGNATURE ── -->
+      <div style="border-top:2px solid #000;display:flex;justify-content:flex-end;">
+        <div style="border-left:2px solid #000;padding:10px 24px;text-align:center;min-width:200px;">
+          <div style="font-size:12px;font-weight:bold;">${hodName}</div>
+          <div style="font-size:11px;">H.O.D.</div>
+          <div style="font-size:11px;">${dept}</div>
         </div>
       </div>
-      <div style="overflow-x:auto;">${buildTimetableTableHtml(tt.grid, options)}</div>
+
     </div>
   `;
 }
@@ -1324,7 +1356,6 @@ function generateTimetable() {
   // ── SLOT HELPERS ──────────────────────────────────────────────
   const lecSlots = SLOTS.map((s,i) => s.type === 'lec' ? i : -1).filter(i => i !== -1);
   const afternoonLecSlots = SLOTS.map((s,i) => (s.type === 'lec' && s.period === 'afternoon') ? i : -1).filter(i => i !== -1);
-  const mdmEndSlots = [...afternoonLecSlots].reverse();
 
   // Morning lec slots (before lunch) and afternoon lec slots (after lunch)
   // Truly consecutive pairs (adjacent row indices, no break between)
@@ -1477,19 +1508,19 @@ function generateTimetable() {
       } else {
         // MDM rules:
         // 1) MDM is a normal lecture (not lab)
-        // 2) Prefer end-of-day slots
+        // 2) No end-of-day restriction — MDM can go anywhere
         // 3) If same-year/same-department divisions already have MDM slots,
         //    align this division to the same day/time slots.
         const isMDM  = sub.name && sub.name.toUpperCase().includes('MDM');
-        const order  = isMDM ? mdmEndSlots : lecSlots;
 
         if (isMDM && mdmAnchorSlots.length > 0) {
           for (const anchor of mdmAnchorSlots) {
             if (placed >= needed) break;
             if (anchor.day !== day) continue;
             if (subOnDay(day, subjectKey)) continue;
-            // Keep faculty clash rules strict for every lecture type, including MDM.
-            if (!grid[day][anchor.si] && isFacultyFree(sub.assignedFaculty, day, anchor.si)) {
+            // MDM is intentionally shared across all divisions at the same slot —
+            // skip the faculty clash check so Div B/C are not blocked by Div A.
+            if (!grid[day][anchor.si]) {
               grid[day][anchor.si] = { ...sub, color };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + anchor.si);
@@ -1499,16 +1530,27 @@ function generateTimetable() {
           continue;
         }
 
-        for (const si of order) {
+        for (const si of lecSlots) {
           // When MDM anchors exist for this year/department, keep those slots reserved
           // so other subjects cannot occupy them in this division.
           if (!isMDM && hasMDMInSelection && mdmAnchorSlotSet.has(`${day}|${si}`)) continue;
-          if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
-            grid[day][si] = { ...sub, color };
-            const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
-            if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
-            placed++;
-            break;
+          // For MDM (first division being generated): place freely, skip faculty clash
+          if (isMDM) {
+            if (!grid[day][si]) {
+              grid[day][si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+              placed++;
+              break;
+            }
+          } else {
+            if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
+              grid[day][si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+              placed++;
+              break;
+            }
           }
         }
       }
@@ -1521,14 +1563,15 @@ function generateTimetable() {
         if (placed >= needed) break;
         if (subOnDay(day, subjectKey)) continue;
         const isMDM = sub.name && sub.name.toUpperCase().includes('MDM');
-        const order = isMDM ? mdmEndSlots : lecSlots;
+        const order = lecSlots;
 
         if (isMDM && mdmAnchorSlots.length > 0) {
           for (const anchor of mdmAnchorSlots) {
             if (placed >= needed) break;
             if (anchor.day !== day) continue;
             if (subOnDay(day, subjectKey)) continue;
-            if (!grid[day][anchor.si] && isFacultyFree(sub.assignedFaculty, day, anchor.si)) {
+            // MDM shared across divs — skip faculty clash check
+            if (!grid[day][anchor.si]) {
               grid[day][anchor.si] = { ...sub, color };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + anchor.si);
@@ -1538,14 +1581,24 @@ function generateTimetable() {
           continue;
         }
 
-        for (const si of order) {
+        for (const si of lecSlots) {
           if (!isMDM && hasMDMInSelection && mdmAnchorSlotSet.has(`${day}|${si}`)) continue;
-          if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
-            grid[day][si] = { ...sub, color };
-            const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
-            if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
-            placed++;
-            break;
+          if (isMDM) {
+            if (!grid[day][si]) {
+              grid[day][si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+              placed++;
+              break;
+            }
+          } else {
+            if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
+              grid[day][si] = { ...sub, color };
+              const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
+              if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+              placed++;
+              break;
+            }
           }
         }
       }
@@ -1555,24 +1608,6 @@ function generateTimetable() {
       unplacedSubjects.push(`${sub.name} (${placed}/${needed})`);
     }
   });
-
-  // Strict rule: if MDM anchors already exist for this year/department, this timetable's
-  // MDM must follow only those exact slots. If it cannot, report explicitly.
-  if (hasMDMInSelection && mdmAnchorSlots.length > 0) {
-    const mdmSubject = selected.find(s => (s.name || '').toUpperCase().includes('MDM') && s.type !== 'Lab');
-    if (mdmSubject) {
-      const mdmNameKey = (mdmSubject.name || '').toUpperCase();
-      const placedMDMAnchors = mdmAnchorSlots.filter(anchor => {
-        const c = grid[anchor.day] && grid[anchor.day][anchor.si];
-        return c && !c.lab && (c.name || '').toUpperCase() === mdmNameKey;
-      }).length;
-      const required = Number(mdmSubject.grades) || 0;
-      if (placedMDMAnchors < required) {
-        const detail = `${mdmSubject.name} (${placedMDMAnchors}/${required}) - strict same-time rule`;
-        if (!unplacedSubjects.includes(detail)) unplacedSubjects.push(detail);
-      }
-    }
-  }
 
   // Render grid
   renderTimetable({ year, div, sem, dept, grid });
@@ -1589,8 +1624,23 @@ function generateTimetable() {
   window._currentTT = { year, div, sem, dept, grid, selected, timestamp: Date.now() };
 }
 
+function cloneGridStripFacultyUndo(grid) {
+  const g = JSON.parse(JSON.stringify(grid));
+  Object.keys(g).forEach(day => {
+    const row = g[day];
+    if (!row || typeof row !== 'object') return;
+    Object.keys(row).forEach(si => {
+      const cell = row[si];
+      if (cell && typeof cell === 'object') delete cell._efRestore;
+    });
+  });
+  return g;
+}
+
 function saveTimetable() {
   if (!window._currentTT) return;
+  const gridBaseline = cloneGridStripFacultyUndo(window._currentTT.grid);
+  window._currentTT = { ...window._currentTT, gridBaseline };
   const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
   // check if already exists for same class identity
   const currentIdentity = getTimetableIdentity(window._currentTT);
@@ -1599,7 +1649,11 @@ function saveTimetable() {
   else { tts.push(window._currentTT); }
   localStorage.setItem('ef_timetables', JSON.stringify(tts));
   renderSavedTT();
-  alert('✅ Timetable saved successfully!');
+
+  // ── Notify backend: save timetable to DB + send faculty emails ──
+  notifyTimetableSaved(window._currentTT);
+
+  alert('✅ Timetable saved! Faculty will receive email notifications.');
   renderAll();
 }
 
@@ -1656,18 +1710,25 @@ function printTT() {
     alert('Please generate or open a timetable first.');
     return;
   }
-  const content = buildTimetableLayoutHtml(window._currentTT, { colorFade: 0.55 });
-  const title   = `${window._currentTT.year} - Div ${window._currentTT.div} Timetable`;
+  const tt      = window._currentTT;
+  const content = buildTimetableLayoutHtml(tt, { colorFade: 0.0, printMode: true });
+  const title   = `${tt.year} - Div ${tt.div} Timetable`;
   const w = window.open('', '_blank');
-  w.document.write(`<html><head><title>${title}</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
   <style>
-    body{font-family:'DM Sans',sans-serif;padding:20px;color:#111;background:#fff;}
-    .tt-print-layout{page-break-inside:avoid;}
-    @page{size:A4 landscape;margin:12mm;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}
+    @page{size:A4 landscape;margin:10mm;}
+    .tt-print-layout{width:100%;}
+    table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
+    th,td{border:1px solid #000;padding:5px 6px;vertical-align:middle;text-align:center;}
+    th{font-weight:bold;background:#fff;font-size:11px;}
+    td{font-size:10px;}
   </style>
   </head><body>${content}</body></html>`);
-  w.document.close(); w.print();
+  w.document.close();
+  w.focus();
+  w.print();
 }
 
 
@@ -1677,6 +1738,35 @@ function logout() {
   localStorage.removeItem('name');
   localStorage.removeItem('department');
   window.location.href = 'index.html';
+}
+
+// ── BACKEND API HELPERS ──────────────────────────────────────────────────
+
+async function notifyTimetableSaved(tt) {
+  try {
+    const res = await fetch(`${API_ROOT}/notify/timetable-saved`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ timetable: tt }),
+    });
+    const data = await res.json();
+    console.log('Notify result:', data.message);
+  } catch (e) {
+    console.warn('Could not reach backend for notifications:', e.message);
+  }
+}
+
+async function syncFacultyToBackend() {
+  try {
+    const allFaculty = JSON.parse(localStorage.getItem('ef_faculty') || '[]');
+    await fetch(`${API_ROOT}/notify/sync-faculty`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ faculty: allFaculty }),
+    });
+  } catch (e) {
+    console.warn('Could not sync faculty to backend:', e.message);
+  }
 }
 
 // ========== INIT ==========

@@ -6,92 +6,780 @@
 <title>EduFlow - Student Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-*{margin:0;padding:0;box-sizing:border-box} :root{--sky:#38BDF8;--sky-light:#E0F4FF;--black:#0A0A0A;--gray:#6B7280;--red:#E63946;--sidebar:260px}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:var(--black)} #sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--black);padding:0 0 24px;display:flex;flex-direction:column} #main{margin-left:var(--sidebar);padding:32px}
-.brand{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:12px;align-items:center}.brand-badge,.avatar{width:40px;height:40px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;color:var(--black);font-family:'Bebas Neue',sans-serif}.brand-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff}.brand-sub,.user-role,.section{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4)}
-.section{padding:20px 16px 8px;color:rgba(255,255,255,.3)} .nav-item{display:flex;gap:12px;align-items:center;margin:2px 8px;padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.65);cursor:pointer}.nav-item.active,.nav-item:hover{background:var(--sky);color:var(--black)} .nav-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center}
-.userbox{margin-top:auto;padding:0 8px}.user{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:8px}.user-name{font-size:13px;font-weight:600;color:#fff}.logout{padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.4);cursor:pointer}.logout:hover{background:rgba(230,57,70,.15);color:var(--red)}
-.page{display:none}.page.active{display:block}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:28px}.title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px}.sub{font-size:13px;color:var(--gray);margin-top:2px}.date{background:#fff;border:1px solid #E5E7EB;padding:8px 16px;border-radius:100px;font:12px 'Space Mono',monospace;color:var(--gray)}
-.stats,.grid3,.grid2{display:grid;gap:16px;margin-bottom:28px}.stats{grid-template-columns:repeat(4,1fr)}.grid3{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1.15fr .85fr}
-.card,.action{background:#fff;border:1px solid #F0F0F0;border-radius:20px;padding:24px}.stat{position:relative;overflow:hidden}.icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}.num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1}.label{font-size:13px;color:var(--gray)}.water{position:absolute;right:-16px;bottom:-16px;font:80px 'Bebas Neue',sans-serif;opacity:.06}
-.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.head-title{font-size:15px;font-weight:600}.chip,.btn,.ghost{border:none;border-radius:100px;font-family:'DM Sans',sans-serif}.chip{padding:8px 14px;background:var(--sky-light);color:#0284C7;font-size:12px;font-weight:500}.btn{padding:14px 18px;background:var(--black);color:#fff;font-size:14px;font-weight:600;cursor:pointer}.btn:hover{background:var(--sky);color:var(--black)}.ghost{padding:14px 18px;background:#F4F4F4;font-size:14px;font-weight:600;cursor:pointer}
-.action{cursor:pointer;transition:.2s}.action:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08)}.action-title{font-size:15px;font-weight:600}.action-copy{font-size:12px;color:var(--gray);line-height:1.6}
-.field{margin-bottom:16px}.field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F7F9FC;font:14px 'DM Sans',sans-serif;outline:none}.field textarea{min-height:96px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
-.form2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.pills,.stack{display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600}.blue{background:var(--sky-light);color:#0284C7}.green{background:#D1FAE5;color:#065F46}.yellow{background:#FEF9C3;color:#854D0E}.purple{background:#EDE9FE;color:#5B21B6}.pink{background:#FCE7F3;color:#9D174D}
-.list{display:grid;gap:12px}.item{border:1px solid #F0F0F0;border-radius:16px;padding:16px}.item-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:8px}.item-title{font-size:15px;font-weight:700}.item-sub,.item-note,.empty{font-size:12px;color:var(--gray);line-height:1.6}.empty{padding:24px 0;text-align:center}
-@media (max-width:1000px){.stats,.grid3,.grid2,.form2{grid-template-columns:1fr 1fr}} @media (max-width:820px){#sidebar{position:static;width:100%;height:auto} #main{margin-left:0;padding:20px} .stats,.grid3,.grid2,.form2{grid-template-columns:1fr}}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--sky:#38BDF8;--sky-light:#E0F4FF;--black:#0A0A0A;--gray:#6B7280;--red:#E63946;--green:#065F46;--green-bg:#D1FAE5;--yellow:#854D0E;--yellow-bg:#FEF9C3;--purple:#5B21B6;--purple-bg:#EDE9FE;--sidebar:260px}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:var(--black)}
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--black);padding:0 0 24px;display:flex;flex-direction:column;overflow-y:auto}
+#main{margin-left:var(--sidebar);padding:32px;min-height:100vh}
+.brand{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:12px;align-items:center;flex-shrink:0}
+.brand-badge,.avatar{width:40px;height:40px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;color:var(--black);font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;flex-shrink:0}
+.brand-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff}
+.brand-sub,.user-role,.section{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.section{padding:20px 16px 8px;color:rgba(255,255,255,.3)}
+.nav-item{display:flex;gap:12px;align-items:center;margin:2px 8px;padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.65);cursor:pointer;text-decoration:none;font-size:14px;font-weight:500}
+.nav-item.active,.nav-item:hover{background:var(--sky);color:var(--black)}
+.nav-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.userbox{margin-top:auto;padding:0 8px;flex-shrink:0}
+.user{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:8px}
+.user-name{font-size:13px;font-weight:600;color:#fff}
+.logout{padding:12px 16px;border-radius:12px;color:rgba(255,255,255,.4);cursor:pointer;font-size:13px}
+.logout:hover{background:rgba(230,57,70,.15);color:var(--red)}
+.page{display:none}.page.active{display:block}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:28px}
+.title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px}
+.sub{font-size:13px;color:var(--gray);margin-top:2px}
+.date{background:#fff;border:1px solid #E5E7EB;padding:8px 16px;border-radius:100px;font:12px 'Space Mono',monospace;color:var(--gray);white-space:nowrap}
+.stats,.grid3,.grid2{display:grid;gap:16px;margin-bottom:28px}
+.stats{grid-template-columns:repeat(4,1fr)}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.grid2{grid-template-columns:1.15fr .85fr}
+.card{background:#fff;border:1px solid #F0F0F0;border-radius:20px;padding:24px}
+.action{background:#fff;border:1px solid #F0F0F0;border-radius:20px;padding:24px;cursor:pointer;transition:.2s}
+.action:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.action-title{font-size:15px;font-weight:600}.action-copy{font-size:12px;color:var(--gray);line-height:1.6;margin-top:6px}
+.stat{position:relative;overflow:hidden}
+.icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1}
+.label{font-size:13px;color:var(--gray)}
+.water{position:absolute;right:-16px;bottom:-16px;font:80px 'Bebas Neue',sans-serif;opacity:.06}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.head-title{font-size:15px;font-weight:600}
+.chip,.btn,.ghost{border:none;border-radius:100px;font-family:'DM Sans',sans-serif;cursor:pointer}
+.chip{padding:6px 14px;background:var(--sky-light);color:#0284C7;font-size:12px;font-weight:500}
+.btn{padding:12px 20px;background:var(--black);color:#fff;font-size:14px;font-weight:600}
+.btn:hover{background:var(--sky);color:var(--black)}
+.ghost{padding:12px 20px;background:#F4F4F4;font-size:14px;font-weight:600;color:var(--black)}
+.ghost:hover{background:#E5E7EB}
+.ghost.danger{background:#FEE2E2;color:#991B1B}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #E5E7EB;background:#F7F9FC;font:14px 'DM Sans',sans-serif;outline:none}
+.field textarea{min-height:80px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
+.form2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.pills,.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600}
+.blue{background:var(--sky-light);color:#0284C7}
+.green{background:var(--green-bg);color:var(--green)}
+.yellow{background:var(--yellow-bg);color:var(--yellow)}
+.purple{background:var(--purple-bg);color:var(--purple)}
+.pink{background:#FCE7F3;color:#9D174D}
+.red{background:#FEE2E2;color:#991B1B}
+.list{display:grid;gap:10px}
+.item{border:1px solid #F0F0F0;border-radius:14px;padding:14px 16px}
+.item-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:6px}
+.item-title{font-size:14px;font-weight:700}
+.item-sub,.item-note,.empty{font-size:12px;color:var(--gray);line-height:1.6}
+.empty{padding:24px 0;text-align:center}
+
+/* Setup card */
+.setup-card{background:linear-gradient(135deg,#0A0A0A 0%,#1a1a2e 100%);border-radius:20px;padding:32px;color:#fff;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.setup-card h3{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--sky);margin-bottom:6px}
+.setup-card p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.6}
+.setup-form{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.setup-form select{padding:10px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font:14px 'DM Sans',sans-serif;outline:none;cursor:pointer}
+.setup-form select option{background:#1a1a2e;color:#fff}
+.setup-form .btn-sky{padding:10px 22px;background:var(--sky);color:var(--black);border:none;border-radius:100px;font:600 14px 'DM Sans',sans-serif;cursor:pointer;font-weight:700}
+
+/* Today's classes */
+.today-slot{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;border:1px solid #F0F0F0;background:#fff;margin-bottom:8px}
+.today-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--gray);min-width:90px;flex-shrink:0}
+.today-subject{font-weight:700;font-size:13px}
+.today-faculty{font-size:11px;color:var(--gray)}
+.today-badge{margin-left:auto;flex-shrink:0}
+.now-indicator{background:#D1FAE5;color:#065F46;font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px}
+
+/* Timetable view */
+.tt-wrap{overflow-x:auto;margin-top:8px}
+.tt-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
+.tt-table th{background:var(--black);color:#fff;padding:10px 8px;text-align:center;font-size:11px;letter-spacing:1px;border:1px solid #222}
+.tt-table td{border:1px solid #E5E7EB;padding:6px;vertical-align:top;min-width:100px;height:60px;background:#fff}
+.tt-cell{border-radius:8px;padding:7px 8px;height:100%;display:flex;flex-direction:column;gap:3px}
+.tt-cell-name{font-weight:700;font-size:11px;color:#0A0A0A;line-height:1.2}
+.tt-cell-fac{font-size:10px;color:#374151}
+.tt-cell-lab{font-size:9px;color:#1D4ED8;font-weight:700}
+.tt-break{background:#F4F4F4;text-align:center;font-size:10px;font-weight:700;letter-spacing:2px;color:#374151;text-transform:uppercase}
+.tt-time{font-family:'Space Mono',monospace;font-size:10px;color:#374151;text-align:center;white-space:nowrap;font-weight:700;background:#F9FAFB}
+
+/* Attendance */
+.att-subject-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1px solid #F0F0F0;background:#fff;margin-bottom:8px;flex-wrap:wrap}
+.att-name{font-weight:700;font-size:14px;flex:1;min-width:120px}
+.att-bar-wrap{flex:2;min-width:160px}
+.att-bar-bg{background:#F0F0F0;border-radius:100px;height:8px;overflow:hidden}
+.att-bar-fill{height:8px;border-radius:100px;transition:width .4s}
+.att-pct{font-family:'Bebas Neue',sans-serif;font-size:20px;min-width:52px;text-align:right}
+.att-btns{display:flex;gap:6px;flex-shrink:0}
+.att-btn{width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:.15s}
+.att-btn:hover{transform:scale(1.1)}
+.att-present{background:#D1FAE5;color:#065F46}
+.att-absent{background:#FEE2E2;color:#991B1B}
+.att-counts{font-size:11px;color:var(--gray);min-width:70px;text-align:center}
+
+/* Exam reminders */
+.exam-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid #F0F0F0;background:#fff;margin-bottom:8px}
+.exam-countdown{min-width:64px;height:64px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;flex-shrink:0}
+.exam-countdown .days{font-size:28px;line-height:1}
+.exam-countdown .dlabel{font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:.7}
+.exam-info{flex:1}
+.exam-title{font-weight:700;font-size:14px;margin-bottom:3px}
+.exam-meta{font-size:11px;color:var(--gray)}
+.exam-del{background:none;border:none;color:#D1D5DB;cursor:pointer;font-size:16px;padding:4px;border-radius:6px}
+.exam-del:hover{background:#FEE2E2;color:#991B1B}
+
+@media (max-width:1000px){.stats,.grid3,.grid2,.form2{grid-template-columns:1fr 1fr}}
+@media (max-width:820px){#sidebar{position:static;width:100%;height:auto}#main{margin-left:0;padding:20px}.stats,.grid3,.grid2,.form2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div id="sidebar">
-  <div class="brand"><div class="brand-badge">EF</div><div><div class="brand-title">EduFlow</div><div class="brand-sub">Student Planner</div></div></div>
-  <div class="section">Planner</div>
+  <div class="brand">
+    <div class="brand-badge">EF</div>
+    <div><div class="brand-title">EduFlow</div><div class="brand-sub">Student Planner</div></div>
+  </div>
+  <div class="section">Main</div>
   <a class="nav-item active" onclick="showPage('dashboard',this)"><div class="nav-icon">📊</div>Dashboard</a>
-  <a class="nav-item" onclick="showPage('planner',this)"><div class="nav-icon">📝</div>Study Planner</a>
-  <a class="nav-item" onclick="showPage('schedule',this)"><div class="nav-icon">📅</div>My Schedule</a>
+  <a class="nav-item" onclick="showPage('timetable',this)"><div class="nav-icon">📅</div>My Timetable</a>
+  <div class="section">Tools</div>
+  <a class="nav-item" onclick="showPage('attendance',this)"><div class="nav-icon">✅</div>Attendance</a>
+  <a class="nav-item" onclick="showPage('exams',this)"><div class="nav-icon">📝</div>Exam Reminders</a>
+  <a class="nav-item" onclick="showPage('planner',this)"><div class="nav-icon">🧠</div>Study Planner</a>
   <div class="userbox">
-    <div class="user"><div class="avatar" id="avatar">S</div><div><div class="user-name" id="sname">Student</div><div class="user-role">Student</div></div></div>
+    <div class="user">
+      <div class="avatar" id="avatar">S</div>
+      <div><div class="user-name" id="sname">Student</div><div class="user-role">Student</div></div>
+    </div>
     <div class="logout" onclick="logout()">🚪 Logout</div>
   </div>
 </div>
+
 <div id="main">
+
+  <!-- ========== DASHBOARD ========== -->
   <div class="page active" id="page-dashboard">
-    <div class="top"><div><div class="title">Student Dashboard</div><div class="sub">Personal study planning only. No faculty timetable or division data is shown here.</div></div><div class="date" id="date">-</div></div>
+    <div class="top">
+      <div><div class="title">Student Dashboard</div><div class="sub" id="dashSub">Your class timetable and study overview.</div></div>
+      <div class="date" id="date">-</div>
+    </div>
+
+    <!-- Setup card (shown only if no class selected) -->
+    <div id="setupCard" style="display:none">
+      <div class="setup-card">
+        <div>
+          <h3>Select Your Class</h3>
+          <p>Choose your year, division and department to load your timetable and today's classes.</p>
+          <div class="setup-form">
+            <select id="setupYear">
+              <option value="">Year</option>
+              <option>FY</option><option>SY</option><option>TY</option><option>LY</option>
+            </select>
+            <select id="setupDiv">
+              <option value="">Division</option>
+              <option>A</option><option>B</option><option>C</option>
+            </select>
+            <select id="setupDept">
+              <option value="">Department</option>
+              <option>CSE - AIML</option><option>CSE - DS</option><option>CSE</option>
+              <option>Electrical</option><option>Mechanical</option><option>ENTC</option>
+              <option>BSH</option><option>Biotech</option><option>Civil</option>
+            </select>
+            <button class="btn-sky" onclick="saveClassSetup()">Load My Timetable →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
     <div class="stats">
-      <div class="card stat"><div class="icon" style="background:#E0F4FF">📘</div><div class="num" id="s1">0</div><div class="label">Study Subjects</div><div class="water">SUB</div></div>
-      <div class="card stat"><div class="icon" style="background:#D1FAE5">🧠</div><div class="num" id="s2">0</div><div class="label">Planned Sessions</div><div class="water">PLAN</div></div>
-      <div class="card stat"><div class="icon" style="background:#FEF9C3">⏳</div><div class="num" id="s3">0</div><div class="label">Hours Planned</div><div class="water">HRS</div></div>
-      <div class="card stat"><div class="icon" style="background:#EDE9FE">🎯</div><div class="num" id="s4">0</div><div class="label">Weekly Goals</div><div class="water">GOAL</div></div>
+      <div class="card stat"><div class="icon" style="background:#E0F4FF">📚</div><div class="num" id="s1">0</div><div class="label">Subjects</div><div class="water">SUB</div></div>
+      <div class="card stat"><div class="icon" style="background:#D1FAE5">✅</div><div class="num" id="s2">0%</div><div class="label">Avg Attendance</div><div class="water">ATT</div></div>
+      <div class="card stat"><div class="icon" style="background:#FEF9C3">📝</div><div class="num" id="s3">0</div><div class="label">Upcoming Exams</div><div class="water">EXM</div></div>
+      <div class="card stat"><div class="icon" style="background:#EDE9FE">🧠</div><div class="num" id="s4">0</div><div class="label">Study Sessions</div><div class="water">STD</div></div>
     </div>
-    <div class="grid3">
-      <div class="action" onclick="showPage('planner',document.querySelectorAll('.nav-item')[1])"><div class="action-title">Add Study Session</div><div class="action-copy">Create your own study slots for revision, projects, or assignments.</div></div>
-      <div class="action" onclick="showPage('schedule',document.querySelectorAll('.nav-item')[2])"><div class="action-title">Open My Schedule</div><div class="action-copy">Review your saved plan for the week in one personal view.</div></div>
-      <div class="action"><div class="action-title">Private Workspace</div><div class="action-copy">This area keeps faculty information hidden and only stores your own plan.</div></div>
-    </div>
+
+    <!-- Today's classes + quick actions -->
     <div class="grid2">
-      <div class="card"><div class="head"><div class="head-title">Upcoming Study Sessions</div></div><div id="preview"></div></div>
-      <div class="card"><div class="head"><div class="head-title">Focus Areas</div></div><div class="stack" id="focus"></div></div>
+      <div class="card">
+        <div class="head">
+          <div class="head-title">Today's Classes 🕐</div>
+          <span class="chip" id="todayDayChip">-</span>
+        </div>
+        <div id="todayClasses"><div class="empty">Select your class above to see today's schedule.</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="action" onclick="showPage('timetable',document.querySelectorAll('.nav-item')[1])">
+          <div class="action-title">📅 View Full Timetable</div>
+          <div class="action-copy">See your complete weekly class schedule.</div>
+        </div>
+        <div class="action" onclick="showPage('attendance',document.querySelectorAll('.nav-item')[3])">
+          <div class="action-title">✅ Mark Attendance</div>
+          <div class="action-copy">Track present/absent for each subject.</div>
+        </div>
+        <div class="action" onclick="showPage('exams',document.querySelectorAll('.nav-item')[4])">
+          <div class="action-title">📝 Exam Reminders</div>
+          <div class="action-copy">Add upcoming exams and see countdowns.</div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- ========== MY TIMETABLE ========== -->
+  <div class="page" id="page-timetable">
+    <div class="top">
+      <div><div class="title">My Timetable</div><div class="sub" id="ttSubLabel">Select your class to load your timetable.</div></div>
+      <button class="chip" onclick="clearClassSetup()">Change Class</button>
+    </div>
+    <div class="card">
+      <div id="studentTTGrid"><div class="empty">No timetable loaded yet. Select your class on the Dashboard.</div></div>
+    </div>
+  </div>
+
+  <!-- ========== ATTENDANCE ========== -->
+  <div class="page" id="page-attendance">
+    <div class="top">
+      <div><div class="title">Attendance Tracker</div><div class="sub">Mark present or absent for each subject. Stay above 75%!</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="head"><div class="head-title">Subject Attendance</div><button class="chip" onclick="resetAttendance()">Reset All</button></div>
+        <div id="attList"><div class="empty">Subjects will appear here once your timetable is loaded.</div></div>
+      </div>
+      <div class="card">
+        <div class="head"><div class="head-title">Attendance Summary</div></div>
+        <div id="attSummary"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EXAM REMINDERS ========== -->
+  <div class="page" id="page-exams">
+    <div class="top">
+      <div><div class="title">Exam Reminders</div><div class="sub">Add upcoming exams or submission deadlines with countdowns.</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="head"><div class="head-title">Add Reminder</div></div>
+        <div class="field"><label>Subject / Title</label><input id="examTitle" type="text" placeholder="e.g. DAA Mid Sem Exam"/></div>
+        <div class="form2">
+          <div class="field"><label>Date</label><input id="examDate" type="date"/></div>
+          <div class="field"><label>Type</label>
+            <select id="examType">
+              <option>Mid Sem Exam</option><option>End Sem Exam</option>
+              <option>Assignment</option><option>Lab Exam</option><option>Quiz</option><option>Project</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Notes (optional)</label><input id="examNote" type="text" placeholder="e.g. Unit 1-3, bring calculator"/></div>
+        <div class="pills"><button class="btn" onclick="addExam()">Add Reminder</button><button class="ghost" onclick="clearExamForm()">Clear</button></div>
+      </div>
+      <div class="card">
+        <div class="head"><div class="head-title">Upcoming Deadlines</div></div>
+        <div id="examList"><div class="empty">No reminders added yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STUDY PLANNER ========== -->
   <div class="page" id="page-planner">
-    <div class="top"><div><div class="title">Create Personal Study Plan</div><div class="sub">Build your own private routine for studying.</div></div></div>
+    <div class="top"><div><div class="title">Study Planner</div><div class="sub">Build your own private study routine.</div></div></div>
     <div class="grid2">
       <div class="card">
         <div class="head"><div class="head-title">New Study Session</div></div>
         <div class="form2">
-          <div class="field"><label>Subject / Topic</label><input id="subject" type="text" placeholder="e.g. Data Structures revision"/></div>
-          <div class="field"><label>Goal</label><input id="goal" type="text" placeholder="e.g. Finish Unit 3 notes"/></div>
-          <div class="field"><label>Day</label><select id="day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
+          <div class="field"><label>Subject / Topic</label><input id="subject" type="text" placeholder="e.g. Data Structures"/></div>
+          <div class="field"><label>Goal</label><input id="goal" type="text" placeholder="e.g. Finish Unit 3"/></div>
+          <div class="field"><label>Day</label>
+            <select id="day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+          </div>
           <div class="field"><label>Time Slot</label><input id="slot" type="text" placeholder="e.g. 7:00 PM - 8:30 PM"/></div>
-          <div class="field"><label>Duration (hours)</label><input id="hours" type="number" min="0.5" step="0.5" placeholder="e.g. 1.5"/></div>
-          <div class="field"><label>Priority</label><select id="priority"><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div class="field"><label>Duration (hrs)</label><input id="hours" type="number" min="0.5" step="0.5" placeholder="1.5"/></div>
+          <div class="field"><label>Priority</label>
+            <select id="priority"><option>High</option><option>Medium</option><option>Low</option></select>
+          </div>
         </div>
         <div class="field"><label>Notes</label><textarea id="notes" placeholder="Optional checklist or reminder"></textarea></div>
-        <div class="pills"><button class="btn" onclick="savePlan()">Save Study Session</button><button class="ghost" onclick="resetForm()">Clear</button></div>
+        <div class="pills"><button class="btn" onclick="savePlan()">Save Session</button><button class="ghost" onclick="resetPlanForm()">Clear</button></div>
       </div>
-      <div class="card"><div class="head"><div class="head-title">Planner Rules</div></div><div class="list"><div class="item"><div class="item-title">Only personal plans</div><div class="item-note">You can create study sessions for exams, assignments, or projects, but not access teacher timetable details.</div></div><div class="item"><div class="item-title">Goal-based routine</div><div class="item-note">Each study block can carry a goal so you know exactly what to complete.</div></div><div class="item"><div class="item-title">Flexible schedule</div><div class="item-note">Use the planner for daily revision, lab prep, project work, or reading sessions.</div></div></div></div>
+      <div class="card">
+        <div class="head"><div class="head-title">My Study Sessions</div></div>
+        <div id="planList"><div class="empty">No sessions yet.</div></div>
+      </div>
     </div>
   </div>
 
-  <div class="page" id="page-schedule">
-    <div class="top"><div><div class="title">My Study Schedule</div><div class="sub">All saved study sessions for your own routine.</div></div></div>
-    <div class="card"><div id="schedule"></div></div>
-  </div>
-</div>
+</div><!-- end #main -->
+
 <script>
-const token=localStorage.getItem('token'),role=localStorage.getItem('role'),studentName=localStorage.getItem('name')||'Student';
-if(!token||role!=='Student'){window.location.href='index.html';}
-document.getElementById('sname').textContent=studentName;document.getElementById('avatar').textContent=studentName.charAt(0).toUpperCase();
-const n=new Date(),d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('date').textContent=`${d[n.getDay()]}, ${n.getDate()} ${m[n.getMonth()]} ${n.getFullYear()}`;
-const getPlans=()=>JSON.parse(localStorage.getItem('ef_study_plans')||'[]').filter(p=>p.studentName===studentName);
-function showPage(page,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById(`page-${page}`).classList.add('active');if(el)el.classList.add('active');renderAll();}
-function renderDashboard(){const pp=getPlans(),subjects=[...new Set(pp.map(p=>p.subject).filter(Boolean))],hours=pp.reduce((sum,p)=>sum+(Number(p.hours)||0),0);document.getElementById('s1').textContent=subjects.length;document.getElementById('s2').textContent=pp.length;document.getElementById('s3').textContent=hours;document.getElementById('s4').textContent=pp.filter(p=>p.goal).length;document.getElementById('focus').innerHTML=subjects.length?subjects.map(s=>`<span class="pill blue">${s}</span>`).join(''):'<div class="empty">Add subjects to build your focus stack.</div>';document.getElementById('preview').innerHTML=pp.length?`<div class="list">${pp.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5).map(p=>`<div class="item"><div class="item-top"><div><div class="item-title">${p.subject}</div><div class="item-sub">${p.goal||'Goal not added yet'}</div></div><span class="pill purple">${p.day} · ${p.slot}</span></div><div class="pills"><span class="pill green">${p.hours} hrs</span><span class="pill ${p.priority==='High'?'pink':p.priority==='Medium'?'yellow':'blue'}">${p.priority}</span></div><div class="item-note">${p.notes||'No note added.'}</div></div>`).join('')}</div>`:'<div class="empty">No study sessions saved yet.</div>';}
-function renderSchedule(){const pp=getPlans();document.getElementById('schedule').innerHTML=pp.length?`<div class="list">${pp.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(p=>`<div class="item"><div class="item-top"><div><div class="item-title">${p.subject}</div><div class="item-sub">${p.goal||'Goal not added yet'}</div></div><span class="pill purple">${p.day} · ${p.slot}</span></div><div class="pills"><span class="pill green">${p.hours} hrs</span><span class="pill ${p.priority==='High'?'pink':p.priority==='Medium'?'yellow':'blue'}">${p.priority}</span></div><div class="item-note">${p.notes||'No note added.'}</div></div>`).join('')}</div>`:'<div class="empty">Your personal study schedule will appear here.</div>';}
-function savePlan(){const subject=document.getElementById('subject').value.trim(),goal=document.getElementById('goal').value.trim(),day=document.getElementById('day').value,slot=document.getElementById('slot').value.trim(),hours=document.getElementById('hours').value,priority=document.getElementById('priority').value,notes=document.getElementById('notes').value.trim();if(!subject||!slot||!hours){alert('Please enter subject, time slot, and duration.');return;} const all=JSON.parse(localStorage.getItem('ef_study_plans')||'[]');all.push({id:Date.now(),studentName,subject,goal,day,slot,hours:Number(hours),priority,notes,createdAt:new Date().toISOString()});localStorage.setItem('ef_study_plans',JSON.stringify(all));resetForm();renderAll();showPage('schedule',document.querySelectorAll('.nav-item')[2]);}
-function resetForm(){document.getElementById('subject').value='';document.getElementById('goal').value='';document.getElementById('slot').value='';document.getElementById('hours').value='';document.getElementById('notes').value='';document.getElementById('priority').value='High';document.getElementById('day').value='Monday';}
-function renderAll(){renderDashboard();renderSchedule();}
-function logout(){localStorage.removeItem('token');localStorage.removeItem('role');localStorage.removeItem('name');localStorage.removeItem('email');window.location.href='index.html';}
+// ── AUTH ──────────────────────────────────────────────────────────────────
+const token       = localStorage.getItem('token');
+const role        = localStorage.getItem('role');
+const studentName = localStorage.getItem('name') || 'Student';
+if (!token || role !== 'Student') window.location.href = 'index.html';
+
+document.getElementById('sname').textContent   = studentName;
+document.getElementById('avatar').textContent  = studentName.charAt(0).toUpperCase();
+
+// ── DATE ──────────────────────────────────────────────────────────────────
+const NOW   = new Date();
+const DAYS  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('date').textContent = `${DAYS[NOW.getDay()]}, ${NOW.getDate()} ${MONTHS[NOW.getMonth()]} ${NOW.getFullYear()}`;
+document.getElementById('todayDayChip').textContent = DAYS[NOW.getDay()];
+
+// ── TIMETABLE SLOT DEFINITIONS (match admin) ──────────────────────────────
+const TT_SLOTS = [
+  { label:'9:15 – 10:05',  type:'lec'   },
+  { label:'10:05 – 10:55', type:'lec'   },
+  { label:'10:55 – 11:15', type:'break', name:'Break' },
+  { label:'11:15 – 12:05', type:'lec'   },
+  { label:'12:05 – 12:55', type:'lec'   },
+  { label:'12:55 – 1:45',  type:'lunch', name:'Lunch Break' },
+  { label:'1:45 – 2:35',   type:'lec'   },
+  { label:'2:35 – 3:25',   type:'lec'   },
+  { label:'3:25 – 4:15',   type:'lec'   },
+];
+const TT_DAYS = ['Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// Slot start times in [hour, minute] for "current class" detection
+const SLOT_START = { 0:[9,15], 1:[10,5], 3:[11,15], 4:[12,5], 6:[13,45], 7:[14,35], 8:[15,25] };
+const SLOT_END   = { 0:[10,5], 1:[10,55],3:[12,5],  4:[12,55],6:[14,35], 7:[15,25], 8:[16,15] };
+
+// ── CLASS SETUP (year/div/dept) ───────────────────────────────────────────
+const SETUP_KEY = `ef_student_class_${studentName}`;
+
+function getClassSetup() {
+  try { return JSON.parse(localStorage.getItem(SETUP_KEY)) || null; } catch { return null; }
+}
+
+function saveClassSetup() {
+  const year = document.getElementById('setupYear').value;
+  const div  = document.getElementById('setupDiv').value;
+  const dept = document.getElementById('setupDept').value;
+  if (!year || !div || !dept) { alert('Please select year, division and department.'); return; }
+  localStorage.setItem(SETUP_KEY, JSON.stringify({ year, div, dept }));
+  renderAll();
+}
+
+function clearClassSetup() {
+  localStorage.removeItem(SETUP_KEY);
+  renderAll();
+}
+
+// ── LOAD TIMETABLE FROM localStorage (saved by admin) ────────────────────
+function getMyTimetable() {
+  const setup = getClassSetup();
+  if (!setup) return null;
+  const all = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  return all.find(tt =>
+    tt.year === setup.year &&
+    tt.div  === setup.div  &&
+    (tt.dept || '') === setup.dept
+  ) || null;
+}
+
+// ── COLOR HELPER ──────────────────────────────────────────────────────────
+function blendWithWhite(hex, factor) {
+  const h = (hex||'').replace('#','');
+  if(!/^[0-9a-fA-F]{6}$/.test(h)) return '#F0F9FF';
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  const nr=Math.round(r+(255-r)*factor),ng=Math.round(g+(255-g)*factor),nb=Math.round(b+(255-b)*factor);
+  const x=n=>n.toString(16).padStart(2,'0');
+  return `#${x(nr)}${x(ng)}${x(nb)}`;
+}
+
+// ── RENDER DASHBOARD ──────────────────────────────────────────────────────
+function renderDashboard() {
+  const setup = getClassSetup();
+  const setupCard = document.getElementById('setupCard');
+
+  if (!setup) {
+    setupCard.style.display = 'block';
+    document.getElementById('dashSub').textContent = 'Select your class below to load your timetable.';
+  } else {
+    setupCard.style.display = 'none';
+    document.getElementById('dashSub').textContent = `${setup.year} — Div ${setup.div} | ${setup.dept}`;
+  }
+
+  // Stats
+  const att     = getAttendance();
+  const subjects = Object.keys(att);
+  const avgAtt  = subjects.length
+    ? Math.round(subjects.reduce((sum, s) => {
+        const d = att[s]; const total = d.present + d.absent;
+        return sum + (total ? (d.present / total) * 100 : 0);
+      }, 0) / subjects.length)
+    : 0;
+  const exams   = getExams().filter(e => new Date(e.date) >= new Date());
+  const plans   = getPlans();
+
+  document.getElementById('s1').textContent = subjects.length || (setup ? countSubjectsFromTT() : 0);
+  document.getElementById('s2').textContent = avgAtt + '%';
+  document.getElementById('s3').textContent = exams.length;
+  document.getElementById('s4').textContent = plans.length;
+
+  renderTodayClasses();
+}
+
+function countSubjectsFromTT() {
+  const tt = getMyTimetable();
+  if (!tt || !tt.grid) return 0;
+  const names = new Set();
+  Object.values(tt.grid).forEach(slots => {
+    Object.values(slots||{}).forEach(cell => {
+      if (cell && cell.name) names.add(cell.name);
+    });
+  });
+  return names.size;
+}
+
+// ── TODAY'S CLASSES ───────────────────────────────────────────────────────
+function renderTodayClasses() {
+  const host  = document.getElementById('todayClasses');
+  const today = DAYS[NOW.getDay()];
+  const tt    = getMyTimetable();
+
+  if (!tt || !tt.grid || !tt.grid[today]) {
+    const setup = getClassSetup();
+    host.innerHTML = setup
+      ? `<div class="empty">No classes on ${today} or timetable not saved by admin yet.</div>`
+      : `<div class="empty">Select your class on the dashboard first.</div>`;
+    return;
+  }
+
+  const slots = tt.grid[today];
+  const nowMins = NOW.getHours() * 60 + NOW.getMinutes();
+  let html = '';
+  let count = 0;
+
+  TT_SLOTS.forEach((slot, si) => {
+    if (slot.type !== 'lec') return;
+    const cell = slots[si];
+    if (!cell || (cell.lab && cell.labPart === 2)) return;
+
+    count++;
+    const start = SLOT_START[si];
+    const end   = SLOT_END[si];
+    const startMins = start ? start[0]*60+start[1] : 0;
+    const endMins   = end   ? end[0]*60+end[1]     : 0;
+    const isNow = start && nowMins >= startMins && nowMins < endMins;
+    const isPast = end && nowMins >= endMins;
+
+    const subjectLabel = cell.name || '-';
+    const facLabel     = cell.assignedFaculty || cell.faculty || '-';
+    const typeLabel    = cell.lab ? 'Lab' : 'Lecture';
+    const pillClass    = cell.lab ? 'yellow' : 'blue';
+
+    html += `
+      <div class="today-slot" style="${isNow ? 'border-color:#38BDF8;background:#F0F9FF;' : isPast ? 'opacity:0.5;' : ''}">
+        <div class="today-time">${slot.label}</div>
+        <div style="flex:1">
+          <div class="today-subject">${subjectLabel}</div>
+          <div class="today-faculty">${facLabel}</div>
+        </div>
+        <div class="today-badge">
+          ${isNow ? '<span class="now-indicator">NOW</span>' : `<span class="pill ${pillClass}">${typeLabel}</span>`}
+        </div>
+      </div>`;
+  });
+
+  host.innerHTML = count ? html : `<div class="empty">No classes scheduled for ${today}.</div>`;
+}
+
+// ── RENDER FULL TIMETABLE ─────────────────────────────────────────────────
+function renderStudentTimetable() {
+  const host  = document.getElementById('studentTTGrid');
+  const label = document.getElementById('ttSubLabel');
+  const tt    = getMyTimetable();
+  const setup = getClassSetup();
+
+  if (!setup) {
+    label.textContent = 'Select your class on the Dashboard first.';
+    host.innerHTML = '<div class="empty">No class selected.</div>';
+    return;
+  }
+  label.textContent = `${setup.year} — Div ${setup.div} | ${setup.dept}`;
+
+  if (!tt || !tt.grid) {
+    host.innerHTML = '<div class="empty">Timetable not published by admin yet. Check back later.</div>';
+    return;
+  }
+
+  let html = `<div class="tt-wrap"><table class="tt-table"><thead><tr>
+    <th style="min-width:90px;">Time</th>
+    ${TT_DAYS.map(d=>`<th>${d}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  TT_SLOTS.forEach((slot, si) => {
+    if (slot.type === 'break' || slot.type === 'lunch') {
+      html += `<tr><td class="tt-time tt-break">${slot.label}</td><td colspan="${TT_DAYS.length}" class="tt-break">${slot.name}</td></tr>`;
+      return;
+    }
+    html += `<tr><td class="tt-time">${slot.label}</td>`;
+    TT_DAYS.forEach(day => {
+      const cell = (tt.grid[day] && tt.grid[day][si]) || null;
+      if (!cell) { html += `<td></td>`; return; }
+      if (cell.lab && cell.labPart === 2) return;
+      const bg = blendWithWhite(cell.color, 0.45);
+      const rowspan = (cell.lab && cell.labPart === 1) ? ' rowspan="2"' : '';
+      html += `<td${rowspan} style="background:#fff;">
+        <div class="tt-cell" style="background:${bg};">
+          <div class="tt-cell-name">${cell.name||''}</div>
+          <div class="tt-cell-fac">${cell.assignedFaculty||cell.faculty||''}</div>
+          ${cell.lab ? '<div class="tt-cell-lab">LAB</div>' : ''}
+        </div>
+      </td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  host.innerHTML = html;
+}
+
+// ── ATTENDANCE ────────────────────────────────────────────────────────────
+const ATT_KEY = `ef_attendance_${studentName}`;
+
+function getAttendance() {
+  try { return JSON.parse(localStorage.getItem(ATT_KEY)) || {}; } catch { return {}; }
+}
+function saveAttendance(data) {
+  localStorage.setItem(ATT_KEY, JSON.stringify(data));
+}
+
+function getSubjectsFromTT() {
+  const tt = getMyTimetable();
+  if (!tt || !tt.grid) return [];
+  const names = new Set();
+  Object.values(tt.grid).forEach(slots => {
+    Object.values(slots||{}).forEach(cell => {
+      if (cell && cell.name && !(cell.lab && cell.labPart === 2)) names.add(cell.name);
+    });
+  });
+  return [...names].sort();
+}
+
+function markAttendance(subject, type) {
+  const data = getAttendance();
+  if (!data[subject]) data[subject] = { present:0, absent:0 };
+  if (type === 'present') data[subject].present++;
+  else data[subject].absent--;
+  // prevent negative
+  if (data[subject].present < 0) data[subject].present = 0;
+  if (data[subject].absent < 0) data[subject].absent = 0;
+  saveAttendance(data);
+  renderAttendance();
+  renderDashboard();
+}
+
+function markAbsent(subject) {
+  const data = getAttendance();
+  if (!data[subject]) data[subject] = { present:0, absent:0 };
+  data[subject].absent++;
+  saveAttendance(data);
+  renderAttendance();
+  renderDashboard();
+}
+
+function resetAttendance() {
+  if (!confirm('Reset all attendance records?')) return;
+  localStorage.removeItem(ATT_KEY);
+  renderAttendance();
+  renderDashboard();
+}
+
+function renderAttendance() {
+  const host    = document.getElementById('attList');
+  const summary = document.getElementById('attSummary');
+  const subjects= getSubjectsFromTT();
+  const data    = getAttendance();
+
+  // If no subjects from timetable, use saved attendance subjects
+  const allSubjects = subjects.length ? subjects : Object.keys(data);
+
+  if (!allSubjects.length) {
+    host.innerHTML = '<div class="empty">No subjects found. Load your timetable first.</div>';
+    summary.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  let summaryHtml = '<div class="list">';
+  let totalPct = 0;
+
+  allSubjects.forEach(sub => {
+    const d = data[sub] || { present:0, absent:0 };
+    const total = d.present + d.absent;
+    const pct   = total ? Math.round((d.present / total) * 100) : 0;
+    totalPct   += pct;
+    const color = pct >= 75 ? '#10B981' : pct >= 60 ? '#F59E0B' : '#EF4444';
+    const pillC = pct >= 75 ? 'green' : pct >= 60 ? 'yellow' : 'red';
+
+    html += `
+      <div class="att-subject-row">
+        <div class="att-name">${sub}</div>
+        <div class="att-bar-wrap">
+          <div class="att-bar-bg"><div class="att-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+          <div style="font-size:10px;color:var(--gray);margin-top:3px;">${d.present}P / ${d.absent}A of ${total} classes</div>
+        </div>
+        <div class="att-pct" style="color:${color};">${pct}%</div>
+        <div class="att-btns">
+          <button class="att-btn att-present" onclick="markAttendance('${sub}','present')" title="Mark Present">✓</button>
+          <button class="att-btn att-absent" onclick="markAbsent('${sub}')" title="Mark Absent">✗</button>
+        </div>
+      </div>`;
+
+    summaryHtml += `<div class="item"><div class="item-top"><div class="item-title">${sub}</div><span class="pill ${pillC}">${pct}%</span></div>
+      <div class="item-note">${d.present} present · ${d.absent} absent · ${total} total${pct < 75 ? ` · <strong style="color:#EF4444;">Need ${Math.ceil((0.75*total - d.present)/(1-0.75))} more</strong>` : ' · ✅ Safe'}</div></div>`;
+  });
+
+  summaryHtml += '</div>';
+  host.innerHTML   = html;
+  summary.innerHTML = summaryHtml;
+}
+
+// ── EXAM REMINDERS ────────────────────────────────────────────────────────
+const EXAM_KEY = `ef_exams_${studentName}`;
+
+function getExams() {
+  try { return JSON.parse(localStorage.getItem(EXAM_KEY)) || []; } catch { return []; }
+}
+
+function addExam() {
+  const title = document.getElementById('examTitle').value.trim();
+  const date  = document.getElementById('examDate').value;
+  const type  = document.getElementById('examType').value;
+  const note  = document.getElementById('examNote').value.trim();
+  if (!title || !date) { alert('Please enter title and date.'); return; }
+  const exams = getExams();
+  exams.push({ id: Date.now(), title, date, type, note });
+  exams.sort((a,b) => new Date(a.date) - new Date(b.date));
+  localStorage.setItem(EXAM_KEY, JSON.stringify(exams));
+  clearExamForm();
+  renderExams();
+  renderDashboard();
+}
+
+function deleteExam(id) {
+  const exams = getExams().filter(e => e.id !== id);
+  localStorage.setItem(EXAM_KEY, JSON.stringify(exams));
+  renderExams();
+  renderDashboard();
+}
+
+function clearExamForm() {
+  document.getElementById('examTitle').value = '';
+  document.getElementById('examDate').value  = '';
+  document.getElementById('examNote').value  = '';
+}
+
+function renderExams() {
+  const host  = document.getElementById('examList');
+  const exams = getExams().sort((a,b) => new Date(a.date) - new Date(b.date));
+  if (!exams.length) { host.innerHTML = '<div class="empty">No reminders added yet.</div>'; return; }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  host.innerHTML = exams.map(e => {
+    const d    = new Date(e.date); d.setHours(0,0,0,0);
+    const diff = Math.round((d - today) / 86400000);
+    const isPast = diff < 0;
+    const bgColor = isPast ? '#F4F4F4' : diff <= 3 ? '#FEE2E2' : diff <= 7 ? '#FEF9C3' : '#D1FAE5';
+    const txtColor= isPast ? '#9CA3AF' : diff <= 3 ? '#991B1B' : diff <= 7 ? '#854D0E' : '#065F46';
+    const daysLabel = isPast ? 'Past' : diff === 0 ? 'TODAY' : `${diff}d`;
+    const typeColors= {
+      'Mid Sem Exam':'red','End Sem Exam':'red','Lab Exam':'yellow',
+      'Assignment':'blue','Quiz':'purple','Project':'green'
+    };
+    const pillC = typeColors[e.type] || 'blue';
+
+    return `
+      <div class="exam-item" style="${isPast ? 'opacity:0.5;' : ''}">
+        <div class="exam-countdown" style="background:${bgColor};color:${txtColor};">
+          <div class="days">${daysLabel}</div>
+          <div class="dlabel">${isPast ? '' : 'left'}</div>
+        </div>
+        <div class="exam-info">
+          <div class="exam-title">${e.title}</div>
+          <div class="exam-meta">
+            <span class="pill ${pillC}" style="margin-right:6px;">${e.type}</span>
+            📅 ${new Date(e.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
+            ${e.note ? `<br>📌 ${e.note}` : ''}
+          </div>
+        </div>
+        <button class="exam-del" onclick="deleteExam(${e.id})" title="Delete">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+// ── STUDY PLANNER ─────────────────────────────────────────────────────────
+const PLAN_KEY = `ef_study_plans`;
+const getPlans = () => {
+  try { return (JSON.parse(localStorage.getItem(PLAN_KEY))||[]).filter(p=>p.studentName===studentName); } catch { return []; }
+};
+
+function savePlan() {
+  const subject  = document.getElementById('subject').value.trim();
+  const goal     = document.getElementById('goal').value.trim();
+  const day      = document.getElementById('day').value;
+  const slot     = document.getElementById('slot').value.trim();
+  const hours    = document.getElementById('hours').value;
+  const priority = document.getElementById('priority').value;
+  const notes    = document.getElementById('notes').value.trim();
+  if (!subject || !slot || !hours) { alert('Please enter subject, time slot, and duration.'); return; }
+  const all = JSON.parse(localStorage.getItem(PLAN_KEY)||'[]');
+  all.push({ id:Date.now(), studentName, subject, goal, day, slot, hours:Number(hours), priority, notes, createdAt:new Date().toISOString() });
+  localStorage.setItem(PLAN_KEY, JSON.stringify(all));
+  resetPlanForm();
+  renderPlanner();
+  renderDashboard();
+}
+
+function resetPlanForm() {
+  ['subject','goal','slot','hours','notes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('priority').value='High';
+  document.getElementById('day').value='Monday';
+}
+
+function renderPlanner() {
+  const pp   = getPlans();
+  const host = document.getElementById('planList');
+  host.innerHTML = pp.length
+    ? `<div class="list">${pp.slice().reverse().map(p=>`
+        <div class="item">
+          <div class="item-top">
+            <div><div class="item-title">${p.subject}</div><div class="item-sub">${p.goal||''}</div></div>
+            <span class="pill purple">${p.day} · ${p.slot}</span>
+          </div>
+          <div class="pills">
+            <span class="pill green">${p.hours}h</span>
+            <span class="pill ${p.priority==='High'?'pink':p.priority==='Medium'?'yellow':'blue'}">${p.priority}</span>
+          </div>
+          ${p.notes?`<div class="item-note" style="margin-top:6px;">${p.notes}</div>`:''}
+        </div>`).join('')}</div>`
+    : '<div class="empty">No study sessions yet.</div>';
+}
+
+// ── PAGE NAVIGATION ───────────────────────────────────────────────────────
+function showPage(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  if (el) el.classList.add('active');
+  renderAll();
+}
+
+// ── RENDER ALL ────────────────────────────────────────────────────────────
+function renderAll() {
+  renderDashboard();
+  renderStudentTimetable();
+  renderAttendance();
+  renderExams();
+  renderPlanner();
+}
+
+function logout() {
+  ['token','role','name','email'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'index.html';
+}
+
 renderAll();
 </script>
 </body>

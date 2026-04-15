@@ -80,6 +80,44 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--gray-lig
 .yellow{background:var(--yellow-bg);color:var(--yellow)}
 .purple{background:var(--purple-bg);color:var(--purple)}
 .empty{padding:28px 0;text-align:center;font-size:13px;color:var(--gray)}
+.tt-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tt-card{border:1px solid #E5E7EB;border-radius:16px;padding:16px;background:#fff;cursor:pointer;transition:.2s;text-align:left;font:inherit}
+.tt-card:hover{border-color:var(--sky);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.tt-card-title{font-weight:700;font-size:15px;margin-bottom:6px}
+.tt-card-meta{font-size:12px;color:var(--gray);line-height:1.5}
+.tt-card-badge{margin-top:10px;display:inline-flex;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;background:var(--green-bg);color:var(--green)}
+.tt-cover-btn{margin-top:6px;padding:4px 10px;border-radius:8px;border:1px solid #111;background:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.tt-cover-btn:hover{background:var(--sky-light)}
+.tt-restore-btn{margin-top:2px;padding:4px 10px;border-radius:8px;border:1px solid #92400E;background:#FFFBEB;font-size:10px;font-weight:700;cursor:pointer;color:#78350F;font-family:'DM Sans',sans-serif}
+.tt-restore-btn:hover{background:#FEF3C7}
+.tt-restore-published-btn{margin-top:4px;padding:4px 10px;border-radius:8px;border:1px solid #3730A3;background:#EEF2FF;font-size:10px;font-weight:700;cursor:pointer;color:#312E81;font-family:'DM Sans',sans-serif}
+.tt-restore-published-btn:hover{background:#E0E7FF}
+.tt-baseline-banner{margin-bottom:16px;padding:12px 16px;border-radius:12px;background:#FEF9C3;border:1px solid #EAB308;font-size:13px;color:#713F12;line-height:1.5}
+.tt-edit-title-btn{margin-top:2px;padding:2px 0;border:none;background:none;font-size:10px;font-weight:600;color:#0284C7;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;text-align:left}
+.tt-edit-title-btn:hover{color:#0369A1}
+.tt-cover-note{font-size:10px;color:var(--gray);margin-top:4px;line-height:1.4}
+.tt-change-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1.5px solid #0284C7;background:#E0F4FF;cursor:pointer;font-size:14px;transition:.2s;flex-shrink:0;margin-top:4px;}
+.tt-change-btn:hover{background:#0284C7;color:#fff;transform:scale(1.1);}
+.tt-change-btn[title]{position:relative;}
+
+/* Change slot modal */
+#changeSlotModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;}
+#changeSlotModal.open{display:flex;}
+.csm-box{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative;}
+.csm-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px;}
+.csm-sub{font-size:12px;color:var(--gray);margin-bottom:20px;}
+.csm-field{margin-bottom:14px;}
+.csm-field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;font-weight:600;}
+.csm-field input,.csm-field select{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #E5E7EB;background:#F7F9FC;font:14px 'DM Sans',sans-serif;outline:none;}
+.csm-field input:focus,.csm-field select:focus{border-color:var(--sky);background:#fff;}
+.csm-error{background:#FEE2E2;color:#991B1B;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:none;line-height:1.5;}
+.csm-error.show{display:block;}
+.csm-btns{display:flex;gap:10px;margin-top:6px;}
+.csm-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray);}
+.csm-close:hover{color:var(--black);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-row .chip{cursor:pointer;border:none}
+.filter-row .chip.active{background:var(--black);color:#fff}
 .list{display:grid;gap:12px}
 .item{border:1px solid #F0F0F0;border-radius:16px;padding:16px}
 .item-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:8px}
@@ -104,10 +142,9 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="section">Workspace</div>
-  <a class="nav-item active" onclick="showPage('dashboard',this)"><div class="nav-icon">DA</div>Dashboard</a>
-  <a class="nav-item" onclick="showPage('details',this)"><div class="nav-icon">IN</div>Teaching Details</a>
-  <a class="nav-item" onclick="showPage('submissions',this)"><div class="nav-icon">MY</div>My Submissions</a>
-  <a class="nav-item" onclick="showPage('lectures',this)"><div class="nav-icon">AL</div>Assigned Lectures</a>
+  <a class="nav-item active" data-nav="dashboard" onclick="showPage('dashboard',this)"><div class="nav-icon">DA</div>Dashboard</a>
+  <a class="nav-item" data-nav="lectures" onclick="showPage('lectures',this)"><div class="nav-icon">AL</div>Assigned Lectures</a>
+  <a class="nav-item" data-nav="timetables" onclick="showPage('timetables',this)"><div class="nav-icon">TT</div>Timetables</a>
   <div class="userbox">
     <div class="user">
       <div class="avatar" id="avatar">F</div>
@@ -125,30 +162,26 @@ tr:last-child td{border-bottom:none}
     <div class="top">
       <div>
         <div class="title">Faculty Dashboard</div>
-        <div class="sub">Submit your teaching details here so HOD can review them and generate the timetable centrally.</div>
+        <div class="sub">Review your assigned slots from the official timetable and open saved class timetables when admin publishes them.</div>
       </div>
       <div class="date" id="date">-</div>
     </div>
 
     <div class="stats">
-      <div class="card stat"><div class="icon" style="background:#E0F4FF">IN</div><div class="num" id="s1">0</div><div class="label">My Submissions</div><div class="water">SUB</div></div>
-      <div class="card stat"><div class="icon" style="background:#D1FAE5">AS</div><div class="num" id="s2">0</div><div class="label">Admin Assignments</div><div class="water">ADM</div></div>
-      <div class="card stat"><div class="icon" style="background:#FEF9C3">DV</div><div class="num" id="s3">0</div><div class="label">Divisions Covered</div><div class="water">DIV</div></div>
-      <div class="card stat"><div class="icon" style="background:#EDE9FE">LD</div><div class="num" id="s4">0</div><div class="label">Weekly Load</div><div class="water">LOAD</div></div>
+      <div class="card stat"><div class="icon" style="background:#E0F4FF">SL</div><div class="num" id="s1">0</div><div class="label">Assigned slots</div><div class="water">TT</div></div>
+      <div class="card stat"><div class="icon" style="background:#D1FAE5">SB</div><div class="num" id="s2">0</div><div class="label">HOD subject records</div><div class="water">ADM</div></div>
+      <div class="card stat"><div class="icon" style="background:#FEF9C3">DV</div><div class="num" id="s3">0</div><div class="label">Divisions you teach</div><div class="water">DIV</div></div>
+      <div class="card stat"><div class="icon" style="background:#EDE9FE">TT</div><div class="num" id="s4">0</div><div class="label">Saved timetables</div><div class="water">CAL</div></div>
     </div>
 
-    <div class="grid3">
-      <div class="action" onclick="showPage('details',document.querySelectorAll('.nav-item')[1])">
-        <div class="action-title">Submit Teaching Details</div>
-        <div class="action-copy">Add the subject, code, semester, division, and course grade that belongs to your teaching profile.</div>
+    <div class="grid2">
+      <div class="action" onclick="showPage('lectures',navEl('lectures'))">
+        <div class="action-title">Assigned Lectures</div>
+        <div class="action-copy">See every period that lists you on the saved timetables, with subject, division, day, and time.</div>
       </div>
-      <div class="action" onclick="showPage('submissions',document.querySelectorAll('.nav-item')[2])">
-        <div class="action-title">Manage My Entries</div>
-        <div class="action-copy">Edit or remove your own submitted teaching records before admin generates the timetable.</div>
-      </div>
-      <div class="action" onclick="showPage('lectures',document.querySelectorAll('.nav-item')[3])">
-        <div class="action-title">Check Assigned Lectures</div>
-        <div class="action-copy">See the lecture slots that admin has already assigned to your login profile.</div>
+      <div class="action" onclick="showPage('timetables',navEl('timetables'))">
+        <div class="action-title">Timetables</div>
+        <div class="action-copy">Browse division timetables admin saved. Cover a colleague only when you have no other class that period.</div>
       </div>
     </div>
 
@@ -175,88 +208,10 @@ tr:last-child td{border-bottom:none}
         </table>
       </div>
       <div class="card">
-        <div class="head"><div class="head-title">My Teaching Snapshot</div></div>
+        <div class="head"><div class="head-title">Your slots preview</div></div>
         <div id="snapshot"></div>
       </div>
     </div>
-  </div>
-
-  <div class="page" id="page-details">
-    <div class="top">
-      <div>
-        <div class="title">Teaching Details</div>
-        <div class="sub">Your name and email come from login. Add the teaching records you want admin to review.</div>
-      </div>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <div class="head"><div class="head-title" id="formTitle">Add Teaching Detail</div></div>
-        <input type="hidden" id="editId" />
-        <div class="form2">
-          <div class="field"><label>Faculty Name</label><input id="teacherName" type="text" readonly /></div>
-          <div class="field"><label>Faculty Email</label><input id="teacherEmail" type="email" readonly /></div>
-          <div class="field"><label>Department</label><input id="teacherDept" type="text" placeholder="e.g. CSE - AIML" /></div>
-          <div class="field"><label>Subject Name</label><input id="subjectName" type="text" placeholder="e.g. Data Structures" /></div>
-          <div class="field"><label>Course Code</label><input id="courseCode" type="text" placeholder="e.g. CS201" /></div>
-          <div class="field"><label>Semester</label>
-            <select id="semester">
-              <option value="Semester 1">Semester 1</option>
-              <option value="Semester 2">Semester 2</option>
-              <option value="Semester 3">Semester 3</option>
-              <option value="Semester 4">Semester 4</option>
-              <option value="Semester 5">Semester 5</option>
-              <option value="Semester 6">Semester 6</option>
-              <option value="Semester 7">Semester 7</option>
-              <option value="Semester 8">Semester 8</option>
-            </select>
-          </div>
-          <div class="field"><label>Year / Division</label><input id="division" type="text" placeholder="e.g. SY-A" /></div>
-          <div class="field"><label>Course Grade / Week</label><input id="grade" type="number" min="1" placeholder="e.g. 4" /></div>
-          <div class="field"><label>Type</label>
-            <select id="type">
-              <option value="Lecture">Lecture</option>
-              <option value="Lab">Lab</option>
-              <option value="Tutorial">Tutorial</option>
-              <option value="Project">Project</option>
-            </select>
-          </div>
-        </div>
-        <div class="field"><label>Notes For HOD</label><textarea id="notes" placeholder="Optional note about workload, preferred handling, or batch details"></textarea></div>
-        <div class="pills">
-          <button class="btn" onclick="saveSubmission()" id="submitBtn">Save Teaching Detail</button>
-          <button class="ghost" onclick="resetForm()">Clear</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="head"><div class="head-title">How This Flow Works</div></div>
-        <div class="list">
-          <div class="item">
-            <div class="item-title">Faculty submits details</div>
-            <div class="item-note">You add your subject, code, semester, division, and weekly course load here.</div>
-          </div>
-          <div class="item">
-            <div class="item-title">Admin reviews centrally</div>
-            <div class="item-note">The HOD/admin dashboard receives all faculty submissions in one shared review list.</div>
-          </div>
-          <div class="item">
-            <div class="item-title">Timetable comes later</div>
-            <div class="item-note">Final lecture slots will be generated from admin side, not separately by every faculty member.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page" id="page-submissions">
-    <div class="top">
-      <div>
-        <div class="title">My Submissions</div>
-        <div class="sub">These are the teaching records you have already sent to admin.</div>
-      </div>
-    </div>
-    <div class="card"><div id="submissionList"></div></div>
   </div>
 
   <div class="page" id="page-lectures">
@@ -281,6 +236,68 @@ tr:last-child td{border-bottom:none}
       </table>
     </div>
   </div>
+
+  <div class="page" id="page-timetables">
+    <div class="top">
+      <div>
+        <div class="title">Timetables</div>
+        <div class="sub">Every timetable admin saves appears here by year, division, semester, and department. Open one to see the full grid. You can take over another teacher's period only if you have no other class in that same slot anywhere.</div>
+      </div>
+      <div class="date" id="dateTt">-</div>
+    </div>
+
+    <div id="ttListWrap">
+      <div class="card" style="margin-bottom:20px">
+        <div class="head">
+          <div class="head-title">Saved class timetables</div>
+          <div class="filter-row" id="ttFilterRow">
+            <span style="font-size:12px;color:var(--gray)">Show</span>
+            <button type="button" class="chip tt-filter active" data-filter="all" onclick="setTimetableFilter('all',this)">All</button>
+            <button type="button" class="chip tt-filter" data-filter="mine" onclick="setTimetableFilter('mine',this)">Where I teach</button>
+          </div>
+        </div>
+        <div id="ttCardList" class="tt-cards" onclick="onTimetableCardListClick(event)"></div>
+      </div>
+    </div>
+
+    <div id="ttDetailWrap" style="display:none">
+      <div class="card">
+        <div class="head">
+          <div>
+            <div class="head-title" id="ttDetailTitle">Timetable</div>
+            <div class="sub" id="ttDetailSub" style="margin-top:6px"></div>
+          </div>
+          <button type="button" class="ghost" onclick="closeTimetableDetail()">← Back to list</button>
+        </div>
+        <p class="sub" style="margin:12px 0 16px"><strong>Cover this class</strong> when a colleague is absent (you can change the title). <strong>Restore previous class</strong> undoes your last cover or title edit on that slot. <strong>Restore to HOD version</strong> resets the cell to the timetable copy from the last time Admin saved it (fixes mistakes from before undo existed). For <strong>your</strong> slots you can also use <strong>Edit class title</strong>. Labs update both rows together.</p>
+        <div id="ttDetailGrid" style="overflow-x:auto" onclick="onTimetableGridClick(event)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHANGE SLOT MODAL ===== -->
+<div id="changeSlotModal" onclick="csmOutsideClick(event)">
+  <div class="csm-box">
+    <button class="csm-close" onclick="closeChangeModal()">✕</button>
+    <div class="csm-title">Change Slot</div>
+    <div class="csm-sub" id="csmSlotInfo">Updating slot</div>
+    <div class="csm-error" id="csmError"></div>
+    <div class="csm-field">
+      <label>New Subject / Class Title</label>
+      <input type="text" id="csmSubject" placeholder="e.g. Data Structures"/>
+    </div>
+    <div class="csm-field">
+      <label>Assign Teacher</label>
+      <select id="csmTeacher">
+        <option value="">— Select Teacher —</option>
+      </select>
+    </div>
+    <div class="csm-btns">
+      <button class="btn" onclick="applyChangeSlot()">✓ Apply Change</button>
+      <button class="ghost" onclick="closeChangeModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -295,15 +312,17 @@ if (!token || role !== 'Teacher / Faculty') {
 
 document.getElementById('fname').textContent = facultyName;
 document.getElementById('avatar').textContent = facultyName.charAt(0).toUpperCase();
-document.getElementById('teacherName').value = facultyName;
-document.getElementById('teacherEmail').value = facultyEmail;
+
+const facultyDepartment = (localStorage.getItem('department') || '').trim();
 
 const now = new Date();
 const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-document.getElementById('date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+document.getElementById('date').textContent = dateStr;
+const dateTtEl = document.getElementById('dateTt');
+if (dateTtEl) dateTtEl.textContent = dateStr;
 
-const STORAGE_KEY = 'ef_faculty_submissions';
 const TT_SLOT_LABELS = {
   0: '9:15 - 10:05',
   1: '10:05 - 10:55',
@@ -315,6 +334,29 @@ const TT_SLOT_LABELS = {
   7: '2:35 - 3:25',
   8: '3:25 - 4:15'
 };
+
+const TT_DAYS = ['Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const TT_SLOTS = [
+  { label:'9:15 – 10:05',  type:'lec',   period: 'morning' },
+  { label:'10:05 – 10:55', type:'lec',   period: 'morning' },
+  { label:'10:55 – 11:15', type:'break', name:'Break' },
+  { label:'11:15 – 12:05', type:'lec',   period: 'morning' },
+  { label:'12:05 – 12:55', type:'lec',   period: 'morning' },
+  { label:'12:55 – 1:45',  type:'lunch', name:'Lunch Break' },
+  { label:'1:45 – 2:35',   type:'lec',   period: 'afternoon' },
+  { label:'2:35 – 3:25',   type:'lec',   period: 'afternoon' },
+  { label:'3:25 – 4:15',   type:'lec',   period: 'afternoon' },
+];
+const TT_COLLEGE_NAME = 'Kolhapur Institue of Technoloy';
+const TT_COLLEGE_TAGLINE = 'Department Timetable';
+const TT_LOGO = 'EF';
+
+let timetableListFilter = 'all';
+let timetableDetailIdentity = '';
+
+function navEl(nav) {
+  return document.querySelector(`.nav-item[data-nav="${nav}"]`);
+}
 
 function normalizeText(value) {
   return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -339,6 +381,561 @@ function getAdminRecords() {
     if (facultyEmail && mappedEmail) return normalizeText(mappedEmail) === normalizeText(facultyEmail);
     return normalizeText(recordFacultyName) === normalizeText(facultyName);
   });
+}
+
+function getTimetableIdentity(tt) {
+  return `${tt.year || ''}|${tt.div || ''}|${tt.sem || ''}|${tt.dept || ''}`;
+}
+
+function facultyMatchesAssignment(assignedName) {
+  const mapped = getFacultyByName(assignedName);
+  const mappedEmail = mapped?.email || '';
+  if (facultyEmail && mappedEmail) {
+    return normalizeText(mappedEmail) === normalizeText(facultyEmail);
+  }
+  return normalizeText(assignedName) === normalizeText(facultyName);
+}
+
+function cellAssignedFaculty(cell) {
+  return cell.assignedFaculty || cell.faculty || '';
+}
+
+function cellMatchesMe(cell) {
+  return facultyMatchesAssignment(cellAssignedFaculty(cell));
+}
+
+function getAllTimetables() {
+  return JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+}
+
+function getVisibleTimetablesForFaculty() {
+  let list = getAllTimetables();
+  if (facultyDepartment) {
+    list = list.filter(tt => !(tt.dept || '').trim() || (tt.dept || '') === facultyDepartment);
+  }
+  return list;
+}
+
+function saveAllTimetables(tts) {
+  localStorage.setItem('ef_timetables', JSON.stringify(tts));
+}
+
+function timetableIncludesMe(tt) {
+  if (!tt || !tt.grid) return false;
+  let found = false;
+  Object.entries(tt.grid).forEach(([day, slots]) => {
+    Object.entries(slots || {}).forEach(([slotIndex, cell]) => {
+      if (!cell) return;
+      if (cell.lab && cell.labPart === 2) return;
+      if (cellMatchesMe(cell)) found = true;
+    });
+  });
+  return found;
+}
+
+function computeMyBusySlotKeys() {
+  const busy = new Set();
+  getAllTimetables().forEach(tt => {
+    if (!tt.grid) return;
+    Object.entries(tt.grid).forEach(([day, slots]) => {
+      Object.entries(slots || {}).forEach(([si, cell]) => {
+        if (!cell) return;
+        if (!cellMatchesMe(cell)) return;
+        const i = Number(si);
+        busy.add(`${day}|${i}`);
+        if (cell.lab && cell.labPart === 1) busy.add(`${day}|${i + 1}`);
+      });
+    });
+  });
+  return busy;
+}
+
+function slotsRequiredForCover(cell, slotIndex) {
+  if (cell.lab && cell.labPart === 1) return [slotIndex, slotIndex + 1];
+  return [slotIndex];
+}
+
+function canCoverCell(cell, day, slotIndex, busyKeys) {
+  if (!cell || (cell.lab && cell.labPart === 2)) return false;
+  if (cellMatchesMe(cell)) return false;
+  const name = (cell.name || '').trim();
+  const fac = cellAssignedFaculty(cell).trim();
+  if (!name && !fac) return false;
+  const needed = slotsRequiredForCover(cell, slotIndex);
+  return needed.every(si => !busyKeys.has(`${day}|${si}`));
+}
+
+function snapshotCellForRestore(c) {
+  return {
+    assignedFaculty: c.assignedFaculty != null ? String(c.assignedFaculty) : '',
+    faculty: c.faculty != null ? String(c.faculty) : '',
+    name: c.name != null ? String(c.name) : ''
+  };
+}
+
+function applySnapshotToCell(c, snap) {
+  c.assignedFaculty = snap.assignedFaculty;
+  c.faculty = snap.faculty;
+  c.name = snap.name;
+  delete c._efRestore;
+}
+
+function canCurrentUserRestore(cell) {
+  if (!cell || !cell._efRestore) return false;
+  const r = cell._efRestore;
+  if (cellMatchesMe(cell)) return true;
+  if (facultyMatchesAssignment(r.assignedFaculty)) return true;
+  if (r.faculty && facultyMatchesAssignment(r.faculty)) return true;
+  return false;
+}
+
+function buildRestoreHtml(ttIdentity, day, si, cell) {
+  if (!canCurrentUserRestore(cell)) return '';
+  return `<button type="button" class="tt-restore-btn" data-tt-id="${encodeURIComponent(ttIdentity)}" data-day="${day}" data-slot="${si}">Restore previous class</button>
+          <div class="tt-cover-note">Reverts the previous teacher and class title (and lab partner row).</div>`;
+}
+
+function getPublishedCell(tt, day, si) {
+  if (!tt.gridBaseline || !tt.gridBaseline[day]) return null;
+  const v = tt.gridBaseline[day][si];
+  return v === undefined ? null : v;
+}
+
+function teachingCellsEqual(a, b) {
+  if (a == null && b == null) return true;
+  if (a == null || b == null) return false;
+  const x = snapshotCellForRestore(a);
+  const y = snapshotCellForRestore(b);
+  return normalizeText(x.assignedFaculty) === normalizeText(y.assignedFaculty) &&
+    normalizeText(x.faculty) === normalizeText(y.faculty) &&
+    x.name === y.name;
+}
+
+function slotDiffersFromPublished(tt, day, si, cell) {
+  if (!tt.gridBaseline || !cell) return false;
+  if (cell.lab && cell.labPart === 2) return false;
+  const b1 = getPublishedCell(tt, day, si);
+  if (cell.lab && cell.labPart === 1) {
+    const p2 = tt.grid[day][si + 1];
+    const b2 = getPublishedCell(tt, day, si + 1);
+    return !teachingCellsEqual(cell, b1) || !teachingCellsEqual(p2, b2);
+  }
+  return !teachingCellsEqual(cell, b1);
+}
+
+function canCurrentUserRestorePublished(tt, day, si, cell) {
+  if (!slotDiffersFromPublished(tt, day, si, cell)) return false;
+  const b1 = getPublishedCell(tt, day, si);
+  const baseFac = cellAssignedFaculty(b1 || {});
+  if (cellMatchesMe(cell)) return true;
+  if (baseFac && facultyMatchesAssignment(baseFac)) return true;
+  return false;
+}
+
+function buildPublishedRestoreHtml(tt, ttIdentity, day, si, cell) {
+  if (!canCurrentUserRestorePublished(tt, day, si, cell)) return '';
+  return `<button type="button" class="tt-restore-published-btn" data-tt-id="${encodeURIComponent(ttIdentity)}" data-day="${day}" data-slot="${si}">Restore to HOD version</button>
+          <div class="tt-cover-note">Reset to the last official save in Admin (teacher + title).</div>`;
+}
+
+function copyTeachingFromPublished(target, source) {
+  if (!target || !source) return;
+  target.assignedFaculty = source.assignedFaculty != null ? String(source.assignedFaculty) : '';
+  target.faculty = source.faculty != null ? String(source.faculty) : '';
+  target.name = source.name != null ? String(source.name) : '';
+  delete target._efRestore;
+}
+
+function blendHexWithWhite(hex, factor) {
+  const safeHex = (hex || '').replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(safeHex)) return hex || '#FFFFFF';
+  const r = parseInt(safeHex.slice(0, 2), 16);
+  const g = parseInt(safeHex.slice(2, 4), 16);
+  const b = parseInt(safeHex.slice(4, 6), 16);
+  const nr = Math.round(r + (255 - r) * factor);
+  const ng = Math.round(g + (255 - g) * factor);
+  const nb = Math.round(b + (255 - b) * factor);
+  const toHex = n => n.toString(16).padStart(2, '0');
+  return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
+}
+
+function getTimetableHeaderLine(tt) {
+  const dept = tt.dept || facultyDepartment || 'Department';
+  return `${dept} | ${tt.year || ''} - Div ${tt.div || ''} | ${tt.sem || ''}`;
+}
+
+function buildFacultyTimetableTableHtml(tt, ttIdentity, busyKeys) {
+  const grid = tt.grid;
+  const colorFade = 0.45;
+  const emptyCellBg = blendHexWithWhite('#EAF2FF', 0.7);
+  const breakCellBg = blendHexWithWhite('#E5E7EB', 0.3);
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px;table-layout:fixed;border:2px solid #111;">
+    <thead>
+      <tr>
+        <th style="background:#0A0A0A;color:#fff;padding:12px 10px;text-align:center;font-size:11px;letter-spacing:1px;min-width:130px;border:1px solid #111;">Time</th>
+        ${TT_DAYS.map(d => `<th style="background:#0A0A0A;color:#fff;padding:12px 8px;text-align:center;font-size:11px;letter-spacing:1px;border:1px solid #111;">${d}</th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  TT_SLOTS.forEach((slot, si) => {
+    if (slot.type === 'break' || slot.type === 'lunch') {
+      html += `<tr>
+        <td style="padding:10px 12px;background:${breakCellBg};font-size:11px;color:#374151;font-weight:700;letter-spacing:1px;border:1px solid #111;text-align:center;">${slot.label}</td>
+        <td colspan="${TT_DAYS.length}" style="background:${breakCellBg};text-align:center;font-size:11px;color:#111827;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid #111;">${slot.name}</td>
+      </tr>`;
+      return;
+    }
+
+    html += `<tr>
+      <td style="padding:10px 8px;font-size:11px;color:#374151;font-family:'Space Mono',monospace;white-space:nowrap;border:1px solid #111;text-align:center;font-weight:700;">${slot.label}</td>
+      ${TT_DAYS.map(day => {
+        const cell = (grid[day] && grid[day][si]) || null;
+        if (!cell) {
+          return `<td style="border:1px solid #111;padding:6px;min-width:110px;min-height:72px;vertical-align:top;background:${emptyCellBg};"></td>`;
+        }
+        if (cell.lab && cell.labPart === 2) return '';
+
+        const cover = canCoverCell(cell, day, si, busyKeys);
+        const mine = cellMatchesMe(cell);
+        const restoreUndoHtml = buildRestoreHtml(ttIdentity, day, si, cell);
+        const restorePublishedHtml = buildPublishedRestoreHtml(tt, ttIdentity, day, si, cell);
+        const anyRestore = restoreUndoHtml || restorePublishedHtml;
+        let coverBlock = '';
+        if (!anyRestore) {
+          if (cover) {
+            coverBlock = `<button type="button" class="tt-change-btn" title="Change this slot" data-tt-id="${encodeURIComponent(ttIdentity)}" data-day="${day}" data-slot="${si}" data-action="change">🔄</button>`;
+          } else if (!mine && (cell.name || cell.faculty || cell.assignedFaculty)) {
+            coverBlock = `<span title="You already teach another class in this period" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1.5px solid #E5E7EB;background:#FFF5F5;margin-top:4px;font-size:13px;cursor:default;" title="Faculty busy">🚫</span>`;
+          }
+        }
+        const mineNote = mine
+          ? `<div class="tt-cover-note">${cell.lab && cell.labPart === 1 ? 'Your lab' : 'Your class'}</div>`
+          : '';
+        const editTitleHtml = mine && !(cell.lab && cell.labPart === 2)
+          ? `<button type="button" class="tt-edit-title-btn" data-tt-id="${encodeURIComponent(ttIdentity)}" data-day="${day}" data-slot="${si}">Edit class title</button>`
+          : '';
+        const actionsBlock = `${restoreUndoHtml}${restorePublishedHtml}${mineNote}${editTitleHtml}${anyRestore ? '' : coverBlock}`;
+
+        if (cell.lab && cell.labPart === 1) {
+          const bg = blendHexWithWhite(cell.color, colorFade);
+          return `<td rowspan="2" style="border:1px solid #111;padding:6px;vertical-align:top;min-width:110px;background:#fff;">
+            <div style="background:${bg};border-radius:8px;padding:8px;min-height:140px;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;border:1px solid rgba(0,0,0,0.14);">
+              <div style="font-weight:700;font-size:12px;color:#0A0A0A;line-height:1.2;">${cell.name || ''}</div>
+              <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || cell.faculty || 'Faculty: -'}</div>
+              <div style="font-size:10px;color:#1D4ED8;font-weight:700;margin-top:2px;">LAB (DOUBLE SLOT)</div>
+              ${actionsBlock}
+            </div>
+          </td>`;
+        }
+
+        const bg = blendHexWithWhite(cell.color, colorFade);
+        return `<td style="border:1px solid #111;padding:6px;vertical-align:top;min-width:110px;background:#fff;">
+          <div style="background:${bg};border-radius:8px;padding:8px;line-height:1.45;border:1px solid rgba(0,0,0,0.14);display:flex;flex-direction:column;gap:6px;min-height:72px;">
+            <div style="font-weight:700;font-size:12px;color:#0A0A0A;">${cell.name || ''}</div>
+            <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || cell.faculty || 'Faculty: -'}</div>
+            ${actionsBlock}
+          </div>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildFacultyTimetableLayoutHtml(tt, ttIdentity, busyKeys) {
+  return `
+    <div class="tt-print-layout" style="background:#fff;border:2px solid #111;border-radius:0;padding:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #111;padding:12px 14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:56px;height:56px;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:1px;">${TT_LOGO}</div>
+          <div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;">${TT_COLLEGE_NAME}</div>
+            <div style="font-size:12px;color:#374151;font-weight:600;">${TT_COLLEGE_TAGLINE}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:15px;font-weight:800;letter-spacing:.4px;">CLASS TIMETABLE</div>
+          <div style="font-size:12px;color:#374151;font-weight:600;">${getTimetableHeaderLine(tt)}</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;overflow-y:visible;padding-bottom:8px;">${buildFacultyTimetableTableHtml(tt, ttIdentity, busyKeys)}</div>
+    </div>
+  `;
+}
+
+function setTimetableFilter(mode, btn) {
+  timetableListFilter = mode;
+  document.querySelectorAll('.tt-filter').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTimetableCardList();
+}
+
+function renderTimetableCardList() {
+  const host = document.getElementById('ttCardList');
+  if (!host) return;
+  let list = getVisibleTimetablesForFaculty().slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  if (timetableListFilter === 'mine') {
+    list = list.filter(timetableIncludesMe);
+  }
+  if (!list.length) {
+    host.innerHTML = `<div class="empty">${timetableListFilter === 'mine' ? 'No saved timetable includes your classes yet.' : 'No timetables saved yet. Admin must generate and save a timetable first.'}</div>`;
+    return;
+  }
+  host.innerHTML = list.map(tt => {
+    const id = getTimetableIdentity(tt);
+    const mine = timetableIncludesMe(tt);
+    return `<button type="button" class="tt-card" data-tt-open="${encodeURIComponent(id)}">
+      <div class="tt-card-title">${tt.year || '-'} · Division ${tt.div || '-'}</div>
+      <div class="tt-card-meta">${tt.sem || ''}<br />${tt.dept || 'Department not set'}</div>
+      ${mine ? '<span class="tt-card-badge">Includes my classes</span>' : ''}
+    </button>`;
+  }).join('');
+}
+
+function onTimetableCardListClick(event) {
+  const btn = event.target.closest('.tt-card[data-tt-open]');
+  if (!btn) return;
+  openTimetableDetail(decodeURIComponent(btn.getAttribute('data-tt-open') || ''));
+}
+
+function openTimetableDetail(identity) {
+  const tt = getAllTimetables().find(t => getTimetableIdentity(t) === identity);
+  if (!tt || !tt.grid) {
+    alert('Timetable not found or has no grid data.');
+    return;
+  }
+  timetableDetailIdentity = identity;
+  document.getElementById('ttListWrap').style.display = 'none';
+  document.getElementById('ttDetailWrap').style.display = 'block';
+  document.getElementById('ttDetailTitle').textContent = `${tt.year || ''} — Div ${tt.div || ''}`;
+  document.getElementById('ttDetailSub').textContent = `${tt.sem || ''} · ${tt.dept || ''}`;
+  refreshTimetableDetailGrid();
+}
+
+function closeTimetableDetail() {
+  timetableDetailIdentity = '';
+  document.getElementById('ttDetailWrap').style.display = 'none';
+  document.getElementById('ttListWrap').style.display = 'block';
+  renderTimetableCardList();
+}
+
+function refreshTimetableDetailGrid() {
+  const wrap = document.getElementById('ttDetailGrid');
+  if (!wrap || !timetableDetailIdentity) return;
+  const tt = getAllTimetables().find(t => getTimetableIdentity(t) === timetableDetailIdentity);
+  if (!tt || !tt.grid) {
+    wrap.innerHTML = '<div class="empty">Timetable missing.</div>';
+    return;
+  }
+  const busy = computeMyBusySlotKeys();
+  const baselineBanner = !tt.gridBaseline
+    ? `<div class="tt-baseline-banner"><strong>No HOD snapshot on file for this timetable.</strong> Ask Admin to open <strong>Timetables → View</strong> for this class and click <strong>Save</strong> once (even without changes). After that, <strong>Restore to HOD version</strong> can fix wrong teachers such as a slot that was changed before snapshots existed.</div>`
+    : '';
+  wrap.innerHTML = baselineBanner + buildFacultyTimetableLayoutHtml(tt, timetableDetailIdentity, busy);
+}
+
+function onTimetableGridClick(event) {
+  const changeBtn = event.target.closest('.tt-change-btn[data-action="change"]');
+  if (changeBtn) {
+    const id = decodeURIComponent(changeBtn.getAttribute('data-tt-id') || '');
+    const day = changeBtn.getAttribute('data-day') || '';
+    const slot = Number(changeBtn.getAttribute('data-slot'));
+    openChangeModal(id, day, slot);
+    return;
+  }
+  const coverBtn = event.target.closest('.tt-cover-btn');
+  if (coverBtn) {
+    const id = decodeURIComponent(coverBtn.getAttribute('data-tt-id') || '');
+    const day = coverBtn.getAttribute('data-day') || '';
+    const slot = Number(coverBtn.getAttribute('data-slot'));
+    applyCoverSlot(id, day, slot);
+    return;
+  }
+  const restoreBtn = event.target.closest('.tt-restore-btn');
+  if (restoreBtn) {
+    const id = decodeURIComponent(restoreBtn.getAttribute('data-tt-id') || '');
+    const day = restoreBtn.getAttribute('data-day') || '';
+    const slot = Number(restoreBtn.getAttribute('data-slot'));
+    applyRestoreSlot(id, day, slot);
+    return;
+  }
+  const restorePubBtn = event.target.closest('.tt-restore-published-btn');
+  if (restorePubBtn) {
+    const id = decodeURIComponent(restorePubBtn.getAttribute('data-tt-id') || '');
+    const day = restorePubBtn.getAttribute('data-day') || '';
+    const slot = Number(restorePubBtn.getAttribute('data-slot'));
+    applyRestorePublishedSlot(id, day, slot);
+    return;
+  }
+  const editBtn = event.target.closest('.tt-edit-title-btn');
+  if (editBtn) {
+    const id = decodeURIComponent(editBtn.getAttribute('data-tt-id') || '');
+    const day = editBtn.getAttribute('data-day') || '';
+    const slot = Number(editBtn.getAttribute('data-slot'));
+    applyEditMySlotTitle(id, day, slot);
+  }
+}
+
+function applyEditMySlotTitle(identity, day, slotIndex) {
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === identity);
+  if (idx === -1) return;
+  const tt = tts[idx];
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell || (cell.lab && cell.labPart === 2) || !cellMatchesMe(cell)) return;
+
+  const p2 = (cell.lab && cell.labPart === 1) ? tt.grid[day][slotIndex + 1] : null;
+  if (cell.lab && cell.labPart === 1 && (!p2 || !p2.lab)) {
+    alert('Lab partner row is missing.');
+    return;
+  }
+
+  const currentTitle = (cell.name || '').trim();
+  const nextRaw = prompt(
+    'Class title shown on this timetable (press OK to keep the same text — a restore point is still saved so you can undo later):',
+    currentTitle
+  );
+  if (nextRaw === null) return;
+
+  if (!cell._efRestore) {
+    cell._efRestore = snapshotCellForRestore(cell);
+    if (p2) p2._efRestore = snapshotCellForRestore(p2);
+  }
+
+  const nextTitle = nextRaw.trim();
+  if (nextTitle) {
+    cell.name = nextTitle;
+    if (p2) p2.name = nextTitle;
+  }
+
+  saveAllTimetables(tts);
+  renderAll();
+  refreshTimetableDetailGrid();
+}
+
+function applyCoverSlot(identity, day, slotIndex) {
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === identity);
+  if (idx === -1) return;
+  const tt = tts[idx];
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell || (cell.lab && cell.labPart === 2)) return;
+
+  const busy = computeMyBusySlotKeys();
+  if (!canCoverCell(cell, day, slotIndex, busy)) {
+    alert('You cannot cover this class: you already have another teaching period overlapping this slot (check all timetables).');
+    return;
+  }
+
+  const titlePrompt = prompt(
+    'You will be listed as the teacher on this slot.\n\nEdit the class title shown on the timetable (or press OK to keep the current title):',
+    (cell.name || '').trim()
+  );
+  if (titlePrompt === null) return;
+
+  const p2 = (cell.lab && cell.labPart === 1) ? tt.grid[day][slotIndex + 1] : null;
+  if (cell.lab && cell.labPart === 1) {
+    if (!p2 || !p2.lab) {
+      alert('Lab slot data looks incomplete; ask admin to re-save this timetable.');
+      return;
+    }
+  }
+
+  const snap1 = snapshotCellForRestore(cell);
+  const snap2 = p2 ? snapshotCellForRestore(p2) : null;
+  const newTitle = titlePrompt.trim();
+
+  const newFac = facultyName;
+  cell.assignedFaculty = newFac;
+  cell.faculty = newFac;
+  if (newTitle) cell.name = newTitle;
+
+  if (p2) {
+    p2.assignedFaculty = newFac;
+    p2.faculty = newFac;
+    if (newTitle) p2.name = newTitle;
+  }
+
+  cell._efRestore = snap1;
+  if (p2 && snap2) p2._efRestore = snap2;
+
+  saveAllTimetables(tts);
+  renderAll();
+  refreshTimetableDetailGrid();
+  alert('Slot updated. Use “Restore previous class” if you need to undo.');
+}
+
+function applyRestoreSlot(identity, day, slotIndex) {
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === identity);
+  if (idx === -1) return;
+  const tt = tts[idx];
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell || (cell.lab && cell.labPart === 2)) return;
+
+  if (!cell._efRestore || !canCurrentUserRestore(cell)) {
+    alert('You cannot restore this slot.');
+    return;
+  }
+
+  const snap1 = { ...cell._efRestore };
+  const p2 = (cell.lab && cell.labPart === 1) ? tt.grid[day][slotIndex + 1] : null;
+  const snap2 = p2 && p2._efRestore ? { ...p2._efRestore } : null;
+
+  if (cell.lab && cell.labPart === 1 && (!p2 || !snap2)) {
+    alert('Lab partner row is missing restore data.');
+    return;
+  }
+
+  applySnapshotToCell(cell, snap1);
+  if (p2 && snap2) applySnapshotToCell(p2, snap2);
+
+  saveAllTimetables(tts);
+  renderAll();
+  refreshTimetableDetailGrid();
+}
+
+function applyRestorePublishedSlot(identity, day, slotIndex) {
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === identity);
+  if (idx === -1) return;
+  const tt = tts[idx];
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell || (cell.lab && cell.labPart === 2)) return;
+
+  if (!tt.gridBaseline) {
+    alert('There is no HOD snapshot for this timetable yet. Ask Admin to open this timetable in Admin and click Save once.');
+    return;
+  }
+  if (!canCurrentUserRestorePublished(tt, day, slotIndex, cell)) {
+    alert('You cannot restore this slot to the HOD version.');
+    return;
+  }
+  if (!confirm('Reset this slot to match the last time Admin / HOD saved this timetable?')) return;
+
+  const b1 = getPublishedCell(tt, day, slotIndex);
+
+  if (cell.lab && cell.labPart === 1) {
+    const p2 = tt.grid[day][slotIndex + 1];
+    const b2 = getPublishedCell(tt, day, slotIndex + 1);
+    if (!b1 || !b1.lab || !b2 || !b2.lab) {
+      alert('Published snapshot does not have a matching double lab here. Ask Admin to re-save after fixing the timetable.');
+      return;
+    }
+    copyTeachingFromPublished(cell, b1);
+    if (p2) copyTeachingFromPublished(p2, b2);
+  } else if (!b1) {
+    tt.grid[day][slotIndex] = null;
+  } else {
+    copyTeachingFromPublished(cell, b1);
+  }
+
+  saveAllTimetables(tts);
+  renderAll();
+  refreshTimetableDetailGrid();
 }
 
 function getLectureAssignments() {
@@ -376,140 +973,45 @@ function getLectureAssignments() {
   return assignments;
 }
 
-function getAllSubmissions() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-}
-
-function getMySubmissions() {
-  return getAllSubmissions().filter(item => (
-    (facultyEmail && item.facultyEmail === facultyEmail) || item.facultyName === facultyName
-  ));
-}
-
-function saveAllSubmissions(items) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
 function showPage(page, element) {
   document.querySelectorAll('.page').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('active');
   if (element) element.classList.add('active');
-  renderAll();
-}
-
-function resetForm() {
-  document.getElementById('editId').value = '';
-  document.getElementById('formTitle').textContent = 'Add Teaching Detail';
-  document.getElementById('submitBtn').textContent = 'Save Teaching Detail';
-  document.getElementById('teacherDept').value = '';
-  document.getElementById('subjectName').value = '';
-  document.getElementById('courseCode').value = '';
-  document.getElementById('semester').value = 'Semester 1';
-  document.getElementById('division').value = '';
-  document.getElementById('grade').value = '';
-  document.getElementById('type').value = 'Lecture';
-  document.getElementById('notes').value = '';
-}
-
-function saveSubmission() {
-  const editId = document.getElementById('editId').value;
-  const dept = document.getElementById('teacherDept').value.trim();
-  const subjectName = document.getElementById('subjectName').value.trim();
-  const courseCode = document.getElementById('courseCode').value.trim();
-  const semester = document.getElementById('semester').value;
-  const division = document.getElementById('division').value.trim();
-  const grade = document.getElementById('grade').value.trim();
-  const type = document.getElementById('type').value;
-  const notes = document.getElementById('notes').value.trim();
-
-  if (!facultyEmail) {
-    alert('Please log in with a faculty email before saving teaching details.');
-    return;
+  else {
+    const auto = navEl(page);
+    if (auto) auto.classList.add('active');
   }
-  if (!dept || !subjectName || !division || !grade) {
-    alert('Please fill department, subject, year/division, and course grade.');
-    return;
+  if (page === 'timetables') {
+    closeTimetableDetail();
+    renderTimetableCardList();
   }
-
-  const all = getAllSubmissions();
-  const entry = {
-    id: editId ? Number(editId) : Date.now(),
-    facultyName,
-    facultyEmail,
-    facultyDept: dept,
-    subjectName,
-    courseCode,
-    semester,
-    division,
-    grade: Number(grade),
-    type,
-    notes,
-    updatedAt: new Date().toISOString()
-  };
-
-  const next = editId
-    ? all.map(item => item.id === Number(editId) ? entry : item)
-    : [...all, { ...entry, createdAt: entry.updatedAt }];
-
-  saveAllSubmissions(next);
-  resetForm();
-  renderAll();
-  showPage('submissions', document.querySelectorAll('.nav-item')[2]);
-}
-
-function editSubmission(id) {
-  const item = getMySubmissions().find(entry => entry.id === id);
-  if (!item) return;
-  document.getElementById('editId').value = String(item.id);
-  document.getElementById('formTitle').textContent = 'Edit Teaching Detail';
-  document.getElementById('submitBtn').textContent = 'Save Changes';
-  document.getElementById('teacherDept').value = item.facultyDept || '';
-  document.getElementById('subjectName').value = item.subjectName || '';
-  document.getElementById('courseCode').value = item.courseCode || '';
-  document.getElementById('semester').value = item.semester || 'Semester 1';
-  document.getElementById('division').value = item.division || '';
-  document.getElementById('grade').value = item.grade || '';
-  document.getElementById('type').value = item.type || 'Lecture';
-  document.getElementById('notes').value = item.notes || '';
-  showPage('details', document.querySelectorAll('.nav-item')[1]);
-}
-
-function deleteSubmission(id) {
-  const next = getAllSubmissions().filter(item => item.id !== id);
-  saveAllSubmissions(next);
   renderAll();
 }
 
 function renderDashboard() {
-  const submissions = getMySubmissions();
   const adminRecords = getAdminRecords();
   const lectures = getLectureAssignments();
-  const divisions = [...new Set(submissions.map(item => item.division).filter(Boolean))];
-  const load = submissions.reduce((sum, item) => sum + (Number(item.grade) || 0), 0);
+  const divisions = [...new Set(lectures.map(item => item.division).filter(Boolean))];
+  const ttCount = getVisibleTimetablesForFaculty().length;
 
-  document.getElementById('s1').textContent = submissions.length;
+  document.getElementById('s1').textContent = lectures.length;
   document.getElementById('s2').textContent = adminRecords.length;
   document.getElementById('s3').textContent = divisions.length;
-  document.getElementById('s4').textContent = load || lectures.length;
+  document.getElementById('s4').textContent = ttCount;
 
-  document.getElementById('snapshot').innerHTML = submissions.length
-    ? `<div class="list">${submissions.slice().sort((a,b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)).slice(0,5).map(item => `
+  document.getElementById('snapshot').innerHTML = lectures.length
+    ? `<div class="list">${lectures.slice(0, 6).map(item => `
         <div class="item">
           <div class="item-top">
             <div>
-              <div class="item-title">${item.subjectName}</div>
-              <div class="item-sub">${item.courseCode || 'No code'} - ${item.semester} - ${item.division}</div>
+              <div class="item-title">${item.subjectName || '-'}</div>
+              <div class="item-sub">${item.division || '-'} · ${item.day || '-'} · ${item.slot || '-'}</div>
             </div>
-            <span class="pill purple">${item.grade} per week</span>
+            <span class="pill ${item.type === 'Lab' ? 'yellow' : item.type === 'Tutorial' ? 'green' : 'blue'}">${item.type || 'Lecture'}</span>
           </div>
-          <div class="pills">
-            <span class="pill blue">${item.facultyDept || 'Department pending'}</span>
-            <span class="pill green">${item.type}</span>
-          </div>
-          <div class="item-note">${item.notes || 'No note added.'}</div>
         </div>`).join('')}</div>`
-    : `<div class="empty">You have not submitted any teaching details yet.</div>`;
+    : `<div class="empty">No assigned slots yet. After admin saves timetables, your periods will show here.</div>`;
 
   const adminBody = document.getElementById('adminRecords');
   adminBody.innerHTML = adminRecords.length
@@ -525,31 +1027,6 @@ function renderDashboard() {
           <td>${item.grades || '-'}</td>
         </tr>`).join('')
     : `<tr><td colspan="8"><div class="empty">No admin teaching records available yet.</div></td></tr>`;
-}
-
-function renderSubmissions() {
-  const submissions = getMySubmissions().slice().sort((a,b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
-  document.getElementById('submissionList').innerHTML = submissions.length
-    ? `<div class="list">${submissions.map(item => `
-        <div class="item">
-          <div class="item-top">
-            <div>
-              <div class="item-title">${item.subjectName}</div>
-              <div class="item-sub">${item.courseCode || 'No code'} - ${item.semester} - ${item.division}</div>
-            </div>
-            <span class="pill purple">${item.grade} per week</span>
-          </div>
-          <div class="pills">
-            <span class="pill blue">${item.facultyDept || 'Department pending'}</span>
-            <span class="pill green">${item.type}</span>
-          </div>
-          <div class="item-note">${item.notes || 'No note added.'}</div>
-          <div class="item-actions">
-            <button class="ghost" onclick="editSubmission(${item.id})">Edit</button>
-            <button class="ghost danger" onclick="deleteSubmission(${item.id})">Delete</button>
-          </div>
-        </div>`).join('')}</div>`
-    : `<div class="empty">Your submitted teaching records will appear here.</div>`;
 }
 
 function renderLectures() {
@@ -568,7 +1045,6 @@ function renderLectures() {
 
 function renderAll() {
   renderDashboard();
-  renderSubmissions();
   renderLectures();
 }
 
@@ -580,7 +1056,138 @@ function logout() {
   window.location.href = 'index.html';
 }
 
-resetForm();
+// ===== CHANGE SLOT MODAL =====
+let _csmState = null;
+
+function openChangeModal(identity, day, slotIndex) {
+  const tts = getAllTimetables();
+  const tt = tts.find(t => getTimetableIdentity(t) === identity);
+  if (!tt) return;
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell) return;
+
+  const busy = computeMyBusySlotKeys();
+  if (!canCoverCell(cell, day, slotIndex, busy)) {
+    alert('You already have another class at this time. Cannot change this slot.');
+    return;
+  }
+
+  _csmState = { identity, day, slotIndex };
+
+  const slotLabel = TT_SLOT_LABELS[slotIndex] || '';
+  document.getElementById('csmSlotInfo').textContent =
+    `${day}  •  ${slotLabel}  •  ${tt.year || ''} Div ${tt.div || ''}`;
+
+  document.getElementById('csmSubject').value = (cell.name || '').trim();
+
+  const facList = JSON.parse(localStorage.getItem('ef_faculty') || '[]');
+  const sel = document.getElementById('csmTeacher');
+  sel.innerHTML = '<option value="">— Select Teacher —</option>' +
+    facList.map(f => {
+      const n = (f.name || '').trim();
+      const selected = normalizeText(n) === normalizeText(cellAssignedFaculty(cell)) ? 'selected' : '';
+      return `<option value="${n}" ${selected}>${n}</option>`;
+    }).join('');
+
+  const errEl = document.getElementById('csmError');
+  errEl.textContent = '';
+  errEl.classList.remove('show');
+
+  document.getElementById('changeSlotModal').classList.add('open');
+  setTimeout(() => document.getElementById('csmSubject').focus(), 100);
+}
+
+function closeChangeModal() {
+  document.getElementById('changeSlotModal').classList.remove('open');
+  _csmState = null;
+}
+
+function csmOutsideClick(e) {
+  if (e.target.id === 'changeSlotModal') closeChangeModal();
+}
+
+function isTeacherBusyAtSlot(teacherName, day, slotIndex, excludeIdentity) {
+  return getAllTimetables().some(tt => {
+    if (getTimetableIdentity(tt) === excludeIdentity) return false;
+    if (!tt.grid || !tt.grid[day]) return false;
+    const cell = tt.grid[day][slotIndex];
+    if (!cell) return false;
+    if (cell.lab && cell.labPart === 2) return false;
+    const fac = normalizeText(cell.assignedFaculty || cell.faculty || '');
+    if (!fac) return false;
+    if (fac === normalizeText(teacherName)) return true;
+    if (cell.lab && cell.labPart === 1) {
+      const next = tt.grid[day][slotIndex + 1];
+      if (next && normalizeText(next.assignedFaculty || next.faculty || '') === normalizeText(teacherName)) return true;
+    }
+    return false;
+  });
+}
+
+function applyChangeSlot() {
+  if (!_csmState) return;
+  const { identity, day, slotIndex } = _csmState;
+  const errEl = document.getElementById('csmError');
+  errEl.classList.remove('show');
+
+  const newSubject = document.getElementById('csmSubject').value.trim();
+  const newTeacher = document.getElementById('csmTeacher').value.trim();
+
+  if (!newSubject) {
+    errEl.textContent = '⚠️ Please enter a subject / class title.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!newTeacher) {
+    errEl.textContent = '⚠️ Please select a teacher.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  if (isTeacherBusyAtSlot(newTeacher, day, slotIndex, identity)) {
+    const clash = getAllTimetables().find(tt => {
+      if (getTimetableIdentity(tt) === identity) return false;
+      if (!tt.grid || !tt.grid[day]) return false;
+      const c = tt.grid[day][slotIndex];
+      if (!c) return false;
+      if (c.lab && c.labPart === 2) return false;
+      return normalizeText(c.assignedFaculty || c.faculty || '') === normalizeText(newTeacher);
+    });
+    const where = clash ? ` — found in ${clash.year || ''} Div ${clash.div || ''}` : '';
+    errEl.innerHTML = `🚫 <strong>${newTeacher}</strong> is already teaching another class at this time slot${where}. Please choose a different teacher.`;
+    errEl.classList.add('show');
+    return;
+  }
+
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === identity);
+  if (idx === -1) { closeChangeModal(); return; }
+  const tt = tts[idx];
+  const cell = tt.grid[day] && tt.grid[day][slotIndex];
+  if (!cell) { closeChangeModal(); return; }
+
+  const p2 = (cell.lab && cell.labPart === 1) ? tt.grid[day][slotIndex + 1] : null;
+
+  if (!cell._efRestore) {
+    cell._efRestore = snapshotCellForRestore(cell);
+    if (p2) p2._efRestore = snapshotCellForRestore(p2);
+  }
+
+  cell.name = newSubject;
+  cell.assignedFaculty = newTeacher;
+  cell.faculty = newTeacher;
+  if (p2) {
+    p2.name = newSubject;
+    p2.assignedFaculty = newTeacher;
+    p2.faculty = newTeacher;
+  }
+
+  saveAllTimetables(tts);
+  renderAll();
+  refreshTimetableDetailGrid();
+  closeChangeModal();
+}
+
 renderAll();
 </script>
 </body>
