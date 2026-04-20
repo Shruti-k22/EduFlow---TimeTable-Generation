@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>EduFlow — Admin Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -738,13 +739,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
 
 
 <script>
+const API_ROOT = 'http://localhost:5000/api';
+
 // ========== AUTH CHECK ==========
 const token = localStorage.getItem('token');
 const role  = localStorage.getItem('role');
 const name  = localStorage.getItem('name') || 'Admin';
 const adminDepartment = localStorage.getItem('department') || '';
 if (!token || role !== 'Admin / HOD') {
-  window.location.href = 'index.html';
+  // Redirect back to login — works for both file:// and http://localhost
+  const base = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+  window.location.href = base + 'index.html';
 }
 
 // Set admin name
@@ -1642,7 +1647,6 @@ function saveTimetable() {
   const gridBaseline = cloneGridStripFacultyUndo(window._currentTT.grid);
   window._currentTT = { ...window._currentTT, gridBaseline };
   const tts = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
-  // check if already exists for same class identity
   const currentIdentity = getTimetableIdentity(window._currentTT);
   const existIdx = tts.findIndex(t => getTimetableIdentity(t) === currentIdentity);
   if (existIdx !== -1) { tts[existIdx] = window._currentTT; }
@@ -1724,7 +1728,7 @@ function printTT() {
     th,td{border:1px solid #000;padding:5px 6px;vertical-align:middle;text-align:center;}
     th{font-weight:bold;background:#fff;font-size:11px;}
     td{font-size:10px;}
-  </style>
+  <\/style>
   </head><body>${content}</body></html>`);
   w.document.close();
   w.focus();
@@ -1737,7 +1741,8 @@ function logout() {
   localStorage.removeItem('role');
   localStorage.removeItem('name');
   localStorage.removeItem('department');
-  window.location.href = 'index.html';
+  const base = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+  window.location.href = base + 'index.html';
 }
 
 // ── BACKEND API HELPERS ──────────────────────────────────────────────────

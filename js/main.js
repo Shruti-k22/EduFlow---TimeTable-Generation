@@ -229,70 +229,9 @@ function switchTab(tab) {
   document.querySelectorAll('.mtab')[tab === 'login' ? 0 : 1].classList.add('active');
 }
 
-// ========== BACKEND URL ==========
-const API = 'http://localhost:5000/api/auth';
-
-// ========== SIGNUP ==========
-document.querySelector('#p-signup .btn-modal').addEventListener('click', async () => {
-  const name     = document.querySelector('#p-signup input[type="text"]').value.trim();
-  const email    = document.querySelector('#p-signup input[type="email"]').value.trim();
-  const role     = document.querySelector('#p-signup select').value;
-  const password = document.querySelector('#p-signup input[type="password"]').value;
-
-  if (!name || !email || !password) { alert('Please fill in all fields!'); return; }
-
-  try {
-    const res  = await fetch(`${API}/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert('✅ Account created successfully! Please log in.');
-      switchTab('login');
-    } else {
-      alert('❌ ' + data.message);
-    }
-  } catch (err) {
-    alert('❌ Cannot connect to server. Is the backend running?');
-  }
-});
-
-// ========== LOGIN ==========
-document.querySelector('#p-login .btn-modal').addEventListener('click', async () => {
-  const email    = document.querySelector('#p-login input[type="email"]').value.trim();
-  const password = document.querySelector('#p-login input[type="password"]').value;
-  const role     = document.querySelector('#p-login select').value;
-
-  if (!email || !password) { alert('Please fill in all fields!'); return; }
-
-  try {
-    const res  = await fetch(`${API}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.role);
-      localStorage.setItem('name', data.name || email.split('@')[0]);
-      localStorage.setItem('email', data.email || email);
-      if (data.role === 'Admin / HOD') {
-        window.location.href = 'admin.html';
-      } else if (data.role === 'Teacher / Faculty') {
-        window.location.href = 'faculty.html';
-      } else {
-        window.location.href = 'student.html';
-      }
-    } else {
-      alert('❌ ' + data.message);
-    }
-  } catch (err) {
-    alert('❌ Cannot connect to server. Is the backend running?');
-  }
-});
+// ========== AUTH ==========
+// Login and Signup are handled by index.html script block.
+// This section intentionally left empty to avoid conflicts.
 
 // ========== LIVE CLOCK ==========
 function updateClock() {

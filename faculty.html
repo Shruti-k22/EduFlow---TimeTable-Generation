@@ -267,7 +267,10 @@ tr:last-child td{border-bottom:none}
             <div class="head-title" id="ttDetailTitle">Timetable</div>
             <div class="sub" id="ttDetailSub" style="margin-top:6px"></div>
           </div>
-          <button type="button" class="ghost" onclick="closeTimetableDetail()">← Back to list</button>
+          <div style="display:flex;gap:8px;">
+            <button type="button" onclick="printTimetableFromFaculty()" style="background:#D1FAE5;color:#065F46;border:none;padding:10px 20px;border-radius:100px;font-size:13px;cursor:pointer;font-weight:600;">🖨 Print</button>
+            <button type="button" class="ghost" onclick="closeTimetableDetail()">← Back to list</button>
+          </div>
         </div>
         <p class="sub" style="margin:12px 0 16px"><strong>Cover this class</strong> when a colleague is absent (you can change the title). <strong>Restore previous class</strong> undoes your last cover or title edit on that slot. <strong>Restore to HOD version</strong> resets the cell to the timetable copy from the last time Admin saved it (fixes mistakes from before undo existed). For <strong>your</strong> slots you can also use <strong>Edit class title</strong>. Labs update both rows together.</p>
         <div id="ttDetailGrid" style="overflow-x:auto" onclick="onTimetableGridClick(event)"></div>
@@ -307,7 +310,8 @@ const facultyName = localStorage.getItem('name') || 'Faculty';
 const facultyEmail = localStorage.getItem('email') || '';
 
 if (!token || role !== 'Teacher / Faculty') {
-  window.location.href = 'index.html';
+  const base = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+  window.location.href = base + 'index.html';
 }
 
 document.getElementById('fname').textContent = facultyName;
@@ -1043,6 +1047,95 @@ function renderLectures() {
     : `<tr><td colspan="5"><div class="empty">Admin-assigned lecture slots will appear here later.</div></td></tr>`;
 }
 
+// ── PRINT TIMETABLE (Faculty) ─────────────────────────────────────────────
+function printTimetableFromFaculty() {
+  if (!timetableDetailIdentity) { alert('No timetable open.'); return; }
+  const tt = getAllTimetables().find(t => getTimetableIdentity(t) === timetableDetailIdentity);
+  if (!tt || !tt.grid) { alert('Timetable not found.'); return; }
+
+  const PRINT_DAYS = ['Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const PRINT_SLOTS = [
+    { label:'9:15 – 10:05',  type:'lec' },
+    { label:'10:05 – 10:55', type:'lec' },
+    { label:'10:55 – 11:15', type:'break', name:'Break' },
+    { label:'11:15 – 12:05', type:'lec' },
+    { label:'12:05 – 12:55', type:'lec' },
+    { label:'12:55 – 1:45',  type:'lunch', name:'Lunch Break' },
+    { label:'1:45 – 2:35',   type:'lec' },
+    { label:'2:35 – 3:25',   type:'lec' },
+    { label:'3:25 – 4:15',   type:'lec' },
+  ];
+  const dept = tt.dept || facultyDepartment || 'Department';
+  const now2 = new Date();
+  const yr = now2.getFullYear();
+  const acYear = now2.getMonth() >= 6 ? `${yr}-${String(yr+1).slice(2)}` : `${yr-1}-${String(yr).slice(2)}`;
+  const title = `${tt.year} - Div ${tt.div} Timetable`;
+
+  let rows = '';
+  PRINT_SLOTS.forEach((slot, si) => {
+    if (slot.type === 'break' || slot.type === 'lunch') {
+      rows += `<tr><td style="padding:5px;border:1px solid #000;text-align:center;font-weight:bold;font-size:10px;">${slot.label}</td><td colspan="${PRINT_DAYS.length}" style="border:1px solid #000;text-align:center;font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:2px;">${slot.name}</td></tr>`;
+      return;
+    }
+    rows += `<tr><td style="padding:5px;border:1px solid #000;text-align:center;font-size:10px;font-weight:bold;white-space:nowrap;">${slot.label}</td>`;
+    PRINT_DAYS.forEach(day => {
+      const cell = (tt.grid[day] && tt.grid[day][si]) || null;
+      if (!cell) { rows += `<td style="border:1px solid #000;padding:4px;min-width:80px;height:48px;"></td>`; return; }
+      if (cell.lab && cell.labPart === 2) return;
+      const rowspan = (cell.lab && cell.labPart === 1) ? ' rowspan="2"' : '';
+      rows += `<td${rowspan} style="border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;">
+        <div style="font-weight:bold;font-size:10px;">${cell.name || ''}</div>
+        <div style="font-size:9px;color:#333;">(${cell.assignedFaculty || cell.faculty || '-'})</div>
+        ${cell.lab ? '<div style="font-size:9px;font-weight:bold;">Lab (Double Slot)</div>' : ''}
+      </td>`;
+    });
+    rows += '</tr>';
+  });
+
+  const content = `<!DOCTYPE html><html><head><title>${title}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}@page{size:A4 landscape;margin:10mm;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;}</style>
+  </head><body>
+  <div style="border:2px solid #000;width:100%;">
+    <div style="border-bottom:2px solid #000;padding:8px;text-align:center;">
+      <div style="font-size:14px;font-weight:bold;">K.I.T's College of Engineering (Autonomous), Kolhapur</div>
+      <div style="font-size:12px;font-weight:bold;">Department of ${dept}</div>
+      <div style="font-size:12px;font-weight:bold;">Time Table A.Y. ${acYear}</div>
+    </div>
+    <div style="border-bottom:2px solid #000;padding:6px;text-align:center;font-size:13px;font-weight:bold;">${tt.year} ${dept} - Div ${tt.div}</div>
+    <table style="font-size:11px;">
+      <thead><tr><th style="background:#fff;font-size:11px;min-width:90px;">Time</th>${PRINT_DAYS.map(d=>`<th style="background:#fff;font-size:11px;">${d}</th>`).join('')}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div></body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(content);
+  w.document.close(); w.focus(); w.print();
+}
+
+// ── SAVE TIMETABLE (Faculty) ──────────────────────────────────────────────
+function saveTimetableFromFaculty() {
+  if (!timetableDetailIdentity) { alert('No timetable open.'); return; }
+  const tts = getAllTimetables();
+  const idx = tts.findIndex(t => getTimetableIdentity(t) === timetableDetailIdentity);
+  if (idx === -1) { alert('Timetable not found.'); return; }
+
+  const tt = tts[idx];
+  const gridBaseline = JSON.parse(JSON.stringify(tt.grid));
+  Object.keys(gridBaseline).forEach(day => {
+    const row = gridBaseline[day];
+    if (!row || typeof row !== 'object') return;
+    Object.keys(row).forEach(si => {
+      const cell = row[si];
+      if (cell && typeof cell === 'object') delete cell._efRestore;
+    });
+  });
+  tts[idx] = { ...tt, gridBaseline };
+  localStorage.setItem('ef_timetables', JSON.stringify(tts));
+  alert('✅ Timetable saved successfully!');
+  refreshTimetableDetailGrid();
+}
+
 function renderAll() {
   renderDashboard();
   renderLectures();
@@ -1053,7 +1146,8 @@ function logout() {
   localStorage.removeItem('role');
   localStorage.removeItem('name');
   localStorage.removeItem('email');
-  window.location.href = 'index.html';
+  const base = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+  window.location.href = base + 'index.html';
 }
 
 // ===== CHANGE SLOT MODAL =====

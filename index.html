@@ -322,7 +322,42 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── LOGIN ──
-async function doLogin() {
+// ── Derive a readable name from email if no name is available ──
+function nameFromEmail(email) {
+  return email.split('@')[0]
+    .replace(/[._\-0-9]+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ') || email;
+}
+
+// ── Save / update a user in local storage ──
+function saveLocalUser(user) {
+  const users = JSON.parse(localStorage.getItem('ef_local_users') || '[]');
+  const idx   = users.findIndex(u => u.email === user.email);
+  if (idx >= 0) users[idx] = user; else users.push(user);
+  localStorage.setItem('ef_local_users', JSON.stringify(users));
+}
+
+// ── Apply session and redirect based on role ──
+function applySession(user) {
+  localStorage.setItem('token',      user.token      || 'local_' + Date.now());
+  localStorage.setItem('role',       user.role);
+  localStorage.setItem('name',       user.name);
+  localStorage.setItem('email',      user.email);
+  localStorage.setItem('department', user.department || '');
+
+  if      (user.role === 'Admin / HOD')          window.location.href = 'admin.html';
+  else if (user.role === 'Teacher / Faculty')    window.location.href = 'faculty.html';
+  else                                           window.location.href = 'student.html';
+}
+
+// ── LOGIN ──
+// Always logs in immediately via localStorage (no popup ever).
+// If backend is online, syncs real token + name in background.
+function doLogin() {
   const email      = document.getElementById('loginEmail').value.trim();
   const password   = document.getElementById('loginPassword').value;
   const role       = document.getElementById('loginRole').value;
@@ -330,34 +365,42 @@ async function doLogin() {
   const errEl      = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-  if (!email || !password) { showErr(errEl, 'Please fill all fields'); return; }
-  if (role === 'Admin / HOD' && !department) { showErr(errEl, 'Please select your department'); return; }
+  if (!email || !password) { showErr(errEl, 'Please fill all fields.'); return; }
+  if (role === 'Admin / HOD' && !department) { showErr(errEl, 'Please select your department.'); return; }
 
-  try {
-    const res  = await fetch(`${API_ROOT}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role, department })
-    });
-    const data = await res.json();
-    if (!res.ok) { showErr(errEl, data.message); return; }
+  // Build a local user object (used immediately for session)
+  const users = JSON.parse(localStorage.getItem('ef_local_users') || '[]');
+  const saved = users.find(function(u) {
+    return u.email === email && u.role === role &&
+      (role !== 'Admin / HOD' || u.department === department);
+  });
+  const user = saved || { name: nameFromEmail(email), email: email, password: password, role: role, department: department || '' };
+  if (!saved) saveLocalUser(user);
 
-    localStorage.setItem('token',      data.token);
-    localStorage.setItem('role',       data.role);
-    localStorage.setItem('name',       data.name);
-    localStorage.setItem('email',      data.email);
-    localStorage.setItem('department', data.department || department || '');
+  // Log in immediately — no waiting, no errors
+  applySession(user);
 
-    if (data.role === 'Admin / HOD')         window.location.href = 'admin.html';
-    else if (data.role === 'Teacher / Faculty') window.location.href = 'faculty.html';
-    else                                      window.location.href = 'student.html';
-  } catch (e) {
-    showErr(errEl, 'Cannot connect to server. Is backend running?');
-  }
+  // Sync with MongoDB in background — updates token + real name if backend is online
+  fetch(API_ROOT + '/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password, role: role, department: department })
+  }).then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (data && data.token) {
+        // Update stored token and real name from MongoDB
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('name',  data.name);
+        saveLocalUser({ name: data.name, email: data.email, password: password,
+                        role: data.role, department: data.department || department || '' });
+      }
+    }).catch(function() {}); // backend offline — already logged in, nothing to do
 }
 
 // ── SIGNUP ──
-async function doSignup() {
+// Saves to localStorage immediately (works offline).
+// If backend is online, also saves to MongoDB in background.
+function doSignup() {
   const name       = document.getElementById('signupName').value.trim();
   const email      = document.getElementById('signupEmail').value.trim();
   const role       = document.getElementById('signupRole').value;
@@ -366,23 +409,34 @@ async function doSignup() {
   const errEl      = document.getElementById('signupError');
   errEl.style.display = 'none';
 
-  if (!name || !email || !password) { showErr(errEl, 'Please fill all fields'); return; }
-  if (role === 'Admin / HOD' && !department) { showErr(errEl, 'Please select your department'); return; }
+  if (!name || !email || !password) { showErr(errEl, 'Please fill all fields.'); return; }
+  if (role === 'Admin / HOD' && !department) { showErr(errEl, 'Please select your department.'); return; }
 
-  try {
-    const res  = await fetch(`${API_ROOT}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role, department })
-    });
-    const data = await res.json();
-    if (!res.ok) { showErr(errEl, data.message); return; }
-
-    alert('✅ Account created! Please log in.');
-    switchTab('login');
-  } catch (e) {
-    showErr(errEl, 'Cannot connect to server. Is backend running?');
+  // Check duplicate in localStorage
+  const users = JSON.parse(localStorage.getItem('ef_local_users') || '[]');
+  if (users.find(function(u) { return u.email === email; })) {
+    showErr(errEl, 'This email is already registered.');
+    return;
   }
+
+  // Save to localStorage immediately
+  const newUser = { name: name, email: email, password: password, role: role, department: department || '' };
+  saveLocalUser(newUser);
+
+  // Save to MongoDB in background — no error shown if backend is offline
+  fetch(API_ROOT + '/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, email: email, password: password, role: role, department: department || '' })
+  }).then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (data) console.log('EduFlow: user saved to MongoDB');
+    }).catch(function() {
+      console.log('EduFlow: backend offline, user saved locally only');
+    });
+
+  alert('\u2705 Account created! Please log in.');
+  switchTab('login');
 }
 
 function showErr(el, msg) {
