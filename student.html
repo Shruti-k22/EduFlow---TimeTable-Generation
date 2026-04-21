@@ -98,6 +98,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
 .tt-cell-name{font-weight:700;font-size:11px;color:#0A0A0A;line-height:1.2}
 .tt-cell-fac{font-size:10px;color:#374151}
 .tt-cell-lab{font-size:9px;color:#1D4ED8;font-weight:700}
+.tt-cell-room{font-size:9px;color:#0369a1;font-weight:700}
 .tt-break{background:#F4F4F4;text-align:center;font-size:10px;font-weight:700;letter-spacing:2px;color:#374151;text-transform:uppercase}
 .tt-time{font-family:'Space Mono',monospace;font-size:10px;color:#374151;text-align:center;white-space:nowrap;font-weight:700;background:#F9FAFB}
 
@@ -407,6 +408,7 @@ function renderTodayClasses() {
         <div style="flex:1">
           <div class="today-subject">${subjectLabel}</div>
           <div class="today-faculty">${facLabel}</div>
+          ${cell.room ? `<div style="font-size:11px;color:#0369a1;font-weight:600;margin-top:2px;">📍 ${cell.room}</div>` : ''}
         </div>
         <div class="today-badge">
           ${isNow ? '<span class="now-indicator">NOW</span>' : `<span class="pill ${pillClass}">${typeLabel}</span>`}
@@ -457,7 +459,7 @@ function renderStudentTimetable() {
         <div class="tt-cell" style="background:${bg};">
           <div class="tt-cell-name">${cell.name||''}</div>
           <div class="tt-cell-fac">${cell.assignedFaculty||cell.faculty||''}</div>
-          ${cell.lab ? '<div class="tt-cell-lab">LAB</div>' : ''}
+          ${cell.room ? `<div style="font-size:9px;color:#0369a1;font-weight:700;">${cell.room}</div>` : (cell.lab ? '<div class="tt-cell-lab">LAB</div>' : '')}
         </div>
       </td>`;
     });
@@ -545,7 +547,7 @@ function expandBrowseTT(index) {
           <div class="tt-cell" style="background:${bg};">
             <div class="tt-cell-name">${cell.name||''}</div>
             <div class="tt-cell-fac">${cell.assignedFaculty||cell.faculty||''}</div>
-            ${cell.lab ? '<div class="tt-cell-lab">LAB</div>' : ''}
+            ${cell.room ? `<div style="font-size:9px;color:#0369a1;font-weight:700;">${cell.room}</div>` : (cell.lab ? '<div class="tt-cell-lab">LAB</div>' : '')}
           </div>
         </td>`;
       });
@@ -652,19 +654,20 @@ function buildPrintHtml(tt, title) {
     rows += `<tr><td style="padding:5px;border:1px solid #000;text-align:center;font-size:10px;font-weight:bold;white-space:nowrap;">${slot.label}</td>`;
     PRINT_DAYS.forEach(day => {
       const cell = (tt.grid[day] && tt.grid[day][si]) || null;
-      if (!cell) { rows += `<td style="border:1px solid #000;padding:4px;min-width:80px;height:48px;"></td>`; return; }
+      if (!cell) { rows += `<td style="border:1px solid #000;padding:4px;min-width:80px;height:58px;"></td>`; return; }
       if (cell.lab && cell.labPart === 2) return;
       const rowspan = (cell.lab && cell.labPart === 1) ? ' rowspan="2"' : '';
       rows += `<td${rowspan} style="border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;">
         <div style="font-weight:bold;font-size:10px;">${cell.name || ''}</div>
         <div style="font-size:9px;color:#333;">(${cell.assignedFaculty || cell.faculty || '-'})</div>
+        ${cell.room ? `<div style="font-size:9px;font-weight:bold;color:#000;">${cell.room}</div>` : ''}
         ${cell.lab ? '<div style="font-size:9px;font-weight:bold;">Lab (Double Slot)</div>' : ''}
       </td>`;
     });
     rows += '</tr>';
   });
   return `<!DOCTYPE html><html><head><title>${title}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}@page{size:A4 landscape;margin:10mm;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;}</style>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}@page{size:A4 landscape;margin:10mm;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;}@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style>
   </head><body>
   <div style="border:2px solid #000;width:100%;">
     <div style="border-bottom:2px solid #000;padding:8px;text-align:center;">

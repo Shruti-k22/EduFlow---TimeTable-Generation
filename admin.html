@@ -367,6 +367,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
   <a class="sb-item" onclick="showPage('subjects')">
     <div class="icon">📚</div> Subjects
   </a>
+  <a class="sb-item" onclick="showPage('classrooms')">
+    <div class="icon">🏫</div> Classrooms
+  </a>
 
 
   <div class="sb-section">Timetable</div>
@@ -423,6 +426,12 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
         <div class="stat-card-l">Timetables Generated</div>
         <div class="stat-card-bg">TT</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:#FEF9C3;">🏫</div>
+        <div class="stat-card-n" style="color:#854D0E;" id="countClassrooms">0</div>
+        <div class="stat-card-l">Classrooms / Labs</div>
+        <div class="stat-card-bg">TT</div>
+      </div>
     </div>
 
     <div class="sec-title">Quick Actions <span>manage everything from here</span></div>
@@ -437,6 +446,12 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
         <div class="action-card-icon" style="background:#D1FAE5;">📚</div>
         <div class="action-card-title">Manage Subjects</div>
         <div class="action-card-desc">Add subjects, assign faculty and set grade points for timetable generation.</div>
+        <div class="action-arrow">→</div>
+      </div>
+      <div class="action-card" onclick="showPage('classrooms')">
+        <div class="action-card-icon" style="background:#FEF9C3;">🏫</div>
+        <div class="action-card-title">Manage Classrooms</div>
+        <div class="action-card-desc">Add classrooms and labs, set capacity and type for timetable assignment.</div>
         <div class="action-arrow">→</div>
       </div>
     </div>
@@ -512,6 +527,38 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
   </div>
 
 
+
+  <!-- ===== CLASSROOMS PAGE ===== -->
+  <div class="page" id="page-classrooms">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Classrooms &amp; Labs</div>
+        <div class="topbar-sub">Manage all classrooms and lab rooms</div>
+      </div>
+      <div class="topbar-right">
+        <button class="card-action" onclick="openModal('modalClassroom')" style="font-size:14px;padding:10px 20px;">+ Add Room</button>
+      </div>
+    </div>
+    <div class="card">
+      <table class="ef-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Room Name</th>
+            <th>Room Number</th>
+            <th>Type</th>
+            <th>Assignment</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="classroomTableBody">
+          <tr><td colspan="6"><div class="empty"><div class="empty-icon">🏫</div><div class="empty-text">No classrooms added yet. Click "+ Add Room" to get started.</div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Lab occupancy check result -->
+    <div id="labCheckResult" style="display:none;margin-top:12px;padding:12px 16px;border-radius:12px;font-size:13px;"></div>
+  </div>
 
   <!-- ===== TIMETABLES PAGE ===== -->
   <div class="page" id="page-timetables">
@@ -601,6 +648,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
           </div>
         </div>
         <div id="ttWarning" style="display:none;margin:-4px 0 14px 0;padding:10px 12px;border-radius:10px;background:#FEF3C7;color:#92400E;font-size:12px;font-weight:600;border:1px solid #FCD34D;"></div>
+        <div id="ttLabSummary" style="display:none;margin:-4px 0 14px 0;padding:12px 14px;border-radius:10px;background:#F0F9FF;border:1px solid #BAE6FD;flex-wrap:wrap;gap:4px;"></div>
         <div style="overflow-x:auto;" id="ttGridWrap"></div>
       </div>
     </div>
@@ -616,6 +664,134 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
     </div>
   </div>
 
+</div>
+
+<!-- MODAL: Add Classroom -->
+<div class="modal-bg" id="modalClassroom">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalClassroom')">✕</button>
+    <div class="modal-title">Add Classroom / Lab</div>
+    <div class="modal-sub">Fill in the room details below</div>
+    <div class="fg"><label>Room Name</label><input type="text" id="roomName" placeholder="e.g. CSAMCR01, Lab 1" oninput="checkLabOccupied()"/></div>
+    <div class="fg"><label>Room Number</label><input type="text" id="roomNumber" placeholder="e.g. 01, 101"/></div>
+    <div class="fg"><label>Type</label>
+      <select id="roomType" onchange="toggleRoomTypeFields()">
+        <option value="Classroom">Classroom</option>
+        <option value="Lab">Lab</option>
+        <option value="Seminar Hall">Seminar Hall</option>
+        <option value="Lecture Hall">Lecture Hall</option>
+      </select>
+    </div>
+
+    <!-- Shown for Classroom / Seminar Hall / Lecture Hall -->
+    <div class="fg" id="roomDivWrap">
+      <label>Assign to Division</label>
+      <select id="roomDivision">
+        <option value="">No fixed division (shared)</option>
+        <option value="FY-A">FY – Division A</option>
+        <option value="FY-B">FY – Division B</option>
+        <option value="FY-C">FY – Division C</option>
+        <option value="SY-A">SY – Division A</option>
+        <option value="SY-B">SY – Division B</option>
+        <option value="SY-C">SY – Division C</option>
+        <option value="TY-A">TY – Division A</option>
+        <option value="TY-B">TY – Division B</option>
+        <option value="TY-C">TY – Division C</option>
+      </select>
+      <div style="font-size:11px;color:var(--gray);margin-top:4px;">Lectures for this division will always be held in this room.</div>
+    </div>
+
+    <!-- Shown for Lab only -->
+    <div id="roomLabWrap" style="display:none;">
+      <div class="fg">
+        <label>Assign to Subject (Lab Subject)</label>
+        <select id="roomLabSubject">
+          <option value="">Select subject — optional</option>
+        </select>
+        <div style="font-size:11px;color:var(--gray);margin-top:4px;">If selected, this lab will always be used for this subject across all divisions.</div>
+      </div>
+      <div class="fg">
+        <label>Assign to Division — optional</label>
+        <select id="roomLabDivision">
+          <option value="">All divisions (shared lab)</option>
+          <option value="FY-A">FY – Division A</option>
+          <option value="FY-B">FY – Division B</option>
+          <option value="FY-C">FY – Division C</option>
+          <option value="SY-A">SY – Division A</option>
+          <option value="SY-B">SY – Division B</option>
+          <option value="SY-C">SY – Division C</option>
+          <option value="TY-A">TY – Division A</option>
+          <option value="TY-B">TY – Division B</option>
+          <option value="TY-C">TY – Division C</option>
+        </select>
+        <div style="font-size:11px;color:var(--gray);margin-top:4px;">Leave blank if this lab is shared across divisions.</div>
+      </div>
+      <div id="roomLabOccupied" style="display:none;margin-bottom:8px;padding:10px 12px;border-radius:10px;background:#FEE2E2;border:1px solid #FECACA;color:#991B1B;font-size:12px;font-weight:600;"></div>
+    </div>
+
+    <div id="roomError" style="color:#E63946;font-size:13px;margin-bottom:8px;display:none;"></div>
+    <button class="btn-primary" onclick="addClassroom()">Add Room</button>
+  </div>
+</div>
+
+<!-- MODAL: Edit Classroom -->
+<div class="modal-bg" id="modalEditClassroom">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEditClassroom')">✕</button>
+    <div class="modal-title">Edit Room</div>
+    <input type="hidden" id="editRoomId"/>
+    <div class="fg"><label>Room Name</label><input type="text" id="editRoomName" placeholder="e.g. CSAMCR01, Lab 1"/></div>
+    <div class="fg"><label>Room Number</label><input type="text" id="editRoomNumber" placeholder="e.g. 01, 101"/></div>
+    <div class="fg"><label>Type</label>
+      <select id="editRoomType" onchange="toggleEditRoomTypeFields()">
+        <option value="Classroom">Classroom</option>
+        <option value="Lab">Lab</option>
+        <option value="Seminar Hall">Seminar Hall</option>
+        <option value="Lecture Hall">Lecture Hall</option>
+      </select>
+    </div>
+    <!-- Classroom fields -->
+    <div class="fg" id="editRoomDivWrap">
+      <label>Assign to Division</label>
+      <select id="editRoomDivision">
+        <option value="">No fixed division (shared)</option>
+        <option value="FY-A">FY – Division A</option>
+        <option value="FY-B">FY – Division B</option>
+        <option value="FY-C">FY – Division C</option>
+        <option value="SY-A">SY – Division A</option>
+        <option value="SY-B">SY – Division B</option>
+        <option value="SY-C">SY – Division C</option>
+        <option value="TY-A">TY – Division A</option>
+        <option value="TY-B">TY – Division B</option>
+        <option value="TY-C">TY – Division C</option>
+      </select>
+    </div>
+    <!-- Lab fields -->
+    <div id="editRoomLabWrap" style="display:none;">
+      <div class="fg">
+        <label>Assigned Subject (Lab)</label>
+        <select id="editRoomLabSubject">
+          <option value="">None — shared lab</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Assigned Division</label>
+        <select id="editRoomLabDivision">
+          <option value="">All divisions (shared)</option>
+          <option value="FY-A">FY – Division A</option>
+          <option value="FY-B">FY – Division B</option>
+          <option value="FY-C">FY – Division C</option>
+          <option value="SY-A">SY – Division A</option>
+          <option value="SY-B">SY – Division B</option>
+          <option value="SY-C">SY – Division C</option>
+          <option value="TY-A">TY – Division A</option>
+          <option value="TY-B">TY – Division B</option>
+          <option value="TY-C">TY – Division C</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="updateClassroom()">Update Room</button>
+  </div>
 </div>
 
 <!-- MODAL: Edit Faculty -->
@@ -684,7 +860,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#F7F9FC;color:
     <div class="modal-title">Add Faculty</div>
     <div class="modal-sub">Fill in the faculty details below</div>
     <div class="fg"><label>Full Name</label><input type="text" id="facName" placeholder="Enter faculty name"/></div>
-    <div class="fg"><label>Email <span style="color:#E63946;font-size:11px;">* required for notifications</span></label><input type="email" id="facEmail" placeholder="faculty@college.edu.in" required/></div>
+    <div class="fg"><label>Email</label><input type="email" id="facEmail" placeholder="faculty@college.edu.in" required/></div>
     <button class="btn-primary" onclick="addFaculty()">Add Faculty</button>
   </div>
 </div>
@@ -763,8 +939,9 @@ const now    = new Date();
 document.getElementById('adminDate').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 
 // ========== DATA ==========
-let faculty  = JSON.parse(localStorage.getItem('ef_faculty')  || '[]');
-let subjects = JSON.parse(localStorage.getItem('ef_subjects') || '[]');
+let faculty    = JSON.parse(localStorage.getItem('ef_faculty')    || '[]');
+let subjects   = JSON.parse(localStorage.getItem('ef_subjects')   || '[]');
+let classrooms = JSON.parse(localStorage.getItem('ef_classrooms') || '[]');
 
 // ── MIGRATION: stamp any legacy subject/faculty (no dept) with the
 //    current HOD's department, then immediately persist so it only
@@ -790,8 +967,9 @@ let subjects = JSON.parse(localStorage.getItem('ef_subjects') || '[]');
 })();
 
 function saveData() {
-  localStorage.setItem('ef_faculty',  JSON.stringify(faculty));
-  localStorage.setItem('ef_subjects', JSON.stringify(subjects));
+  localStorage.setItem('ef_faculty',    JSON.stringify(faculty));
+  localStorage.setItem('ef_subjects',   JSON.stringify(subjects));
+  localStorage.setItem('ef_classrooms', JSON.stringify(classrooms));
 }
 
 function getVisibleFaculty() {
@@ -919,7 +1097,7 @@ function addFaculty() {
   const email = document.getElementById('facEmail').value.trim();
   if (!dept) { alert('Your department is missing. Please log in again.'); return; }
   if (!name) { alert('Please enter faculty name!'); return; }
-  if (!email) { alert('⚠️ Email is required! Faculty will not receive notifications without an email.'); return; }
+  if (!email) { alert('⚠️ Please enter the faculty email.'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('⚠️ Please enter a valid email address.'); return; }
   if (isDuplicateFacultyName(name)) {
     alert('Faculty name already exists. Please enter a different name.');
@@ -962,6 +1140,252 @@ function addSubject() {
 
 
 
+// ========== CLASSROOMS ==========
+
+function getVisibleClassrooms() {
+  if (!adminDepartment) return classrooms;
+  return classrooms.filter(r => !r.dept || r.dept === adminDepartment);
+}
+
+// ── Toggle fields based on room type (Add modal) ──
+function toggleRoomTypeFields() {
+  const type  = document.getElementById('roomType').value;
+  const isLab = type === 'Lab';
+  document.getElementById('roomDivWrap').style.display  = isLab ? 'none'  : 'block';
+  document.getElementById('roomLabWrap').style.display  = isLab ? 'block' : 'none';
+
+  if (isLab) {
+    // Populate lab subject dropdown from current subjects
+    const labSubEl = document.getElementById('roomLabSubject');
+    // Deduplicate by subject name (same subject exists for each division)
+    const uniqueLabSubs = [];
+    const seenNames = new Set();
+    getVisibleSubjects().filter(s => s.type === 'Lab').forEach(s => {
+      if (!seenNames.has(s.name)) { seenNames.add(s.name); uniqueLabSubs.push(s); }
+    });
+    labSubEl.innerHTML = '<option value="">Select subject — optional</option>' +
+      uniqueLabSubs.map(s => `<option value="${s.name}">${s.name}${s.code ? ' (' + s.code + ')' : ''}</option>`).join('');
+  }
+}
+
+// ── Toggle fields based on room type (Edit modal) ──
+function toggleEditRoomTypeFields() {
+  const type  = document.getElementById('editRoomType').value;
+  const isLab = type === 'Lab';
+  document.getElementById('editRoomDivWrap').style.display  = isLab ? 'none'  : 'block';
+  document.getElementById('editRoomLabWrap').style.display  = isLab ? 'block' : 'none';
+}
+
+// ── Check if a lab is already occupied at a time slot across saved timetables ──
+// Returns array of conflict descriptions
+function getLabOccupiedSlots(labName) {
+  const savedTTs = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  const conflicts = [];
+  const roomKey   = labName.toLowerCase().trim();
+
+  savedTTs.forEach(tt => {
+    if (!tt.grid) return;
+    Object.entries(tt.grid).forEach(([day, slots]) => {
+      Object.entries(slots).forEach(([si, cell]) => {
+        if (cell && cell.lab && cell.labPart === 1 && cell.room &&
+            cell.room.toLowerCase().trim() === roomKey) {
+          const slot = (typeof SLOTS !== 'undefined' && SLOTS[si]) ? SLOTS[si].label : `Slot ${si}`;
+          conflicts.push(`${tt.year} Div ${tt.div} — ${cell.name} — ${day} ${slot}`);
+        }
+      });
+    });
+  });
+  return conflicts;
+}
+
+// ── Show lab occupied status when subject/division changes in Add modal ──
+function checkLabOccupied() {
+  const name      = document.getElementById('roomName').value.trim();
+  const occupiedEl = document.getElementById('roomLabOccupied');
+  if (!name) { occupiedEl.style.display = 'none'; return; }
+
+  const conflicts = getLabOccupiedSlots(name);
+  if (conflicts.length > 0) {
+    occupiedEl.innerHTML = '⚠️ <strong>This lab is already assigned in saved timetables:</strong><br>' +
+      conflicts.map(c => `• ${c}`).join('<br>');
+    occupiedEl.style.display = 'block';
+  } else {
+    occupiedEl.innerHTML = '✅ Lab is free — no conflicts in saved timetables.';
+    occupiedEl.style.display = 'block';
+    occupiedEl.style.background = '#D1FAE5';
+    occupiedEl.style.borderColor = '#6EE7B7';
+    occupiedEl.style.color = '#065F46';
+  }
+}
+
+function addClassroom() {
+  const name   = document.getElementById('roomName').value.trim();
+  const number = document.getElementById('roomNumber').value.trim();
+  const type   = document.getElementById('roomType').value;
+  const errEl  = document.getElementById('roomError');
+  errEl.style.display = 'none';
+
+  if (!name)   { errEl.textContent = 'Please enter a room name.';   errEl.style.display = 'block'; return; }
+  if (!number) { errEl.textContent = 'Please enter a room number.'; errEl.style.display = 'block'; return; }
+
+  const isLab    = type === 'Lab';
+  const division = isLab
+    ? document.getElementById('roomLabDivision').value
+    : document.getElementById('roomDivision').value;
+  const labSubject = isLab ? document.getElementById('roomLabSubject').value : '';
+
+  const room = {
+    id: Date.now(),
+    name, number, type, division,
+    labSubject,  // subject code/name this lab is reserved for (empty = shared)
+    dept: adminDepartment || ''
+  };
+
+  classrooms.push(room);
+  saveData();
+  renderAll();
+  closeModal('modalClassroom');
+
+  // Clear form
+  document.getElementById('roomName').value = '';
+  document.getElementById('roomNumber').value = '';
+  document.getElementById('roomDivision').value = '';
+  document.getElementById('roomLabDivision').value = '';
+  document.getElementById('roomLabSubject').value = '';
+  document.getElementById('roomLabOccupied').style.display = 'none';
+}
+
+function editClassroom(id) {
+  const r = classrooms.find(r => r.id === id);
+  if (!r) return;
+  document.getElementById('editRoomId').value       = r.id;
+  document.getElementById('editRoomName').value     = r.name;
+  document.getElementById('editRoomNumber').value   = r.number;
+  document.getElementById('editRoomType').value     = r.type;
+
+  // Populate subject options for lab
+  const editLabSubEl = document.getElementById('editRoomLabSubject');
+  // Deduplicate lab subjects by name
+  const uniqueEditLabSubs = [];
+  const seenEditNames = new Set();
+  getVisibleSubjects().filter(s => s.type === 'Lab').forEach(s => {
+    if (!seenEditNames.has(s.name)) { seenEditNames.add(s.name); uniqueEditLabSubs.push(s); }
+  });
+  editLabSubEl.innerHTML = '<option value="">None — shared lab</option>' +
+    uniqueEditLabSubs.map(s =>
+      `<option value="${s.name}" ${s.name === (r.labSubject||'') ? 'selected' : ''}>${s.name}${s.code ? ' (' + s.code + ')' : ''}</option>`
+    ).join('');
+
+  if (r.type === 'Lab') {
+    document.getElementById('editRoomLabDivision').value = r.division || '';
+    document.getElementById('editRoomLabSubject').value  = r.labSubject || '';
+    document.getElementById('editRoomDivWrap').style.display  = 'none';
+    document.getElementById('editRoomLabWrap').style.display  = 'block';
+  } else {
+    document.getElementById('editRoomDivision').value = r.division || '';
+    document.getElementById('editRoomDivWrap').style.display  = 'block';
+    document.getElementById('editRoomLabWrap').style.display  = 'none';
+  }
+  openModal('modalEditClassroom');
+}
+
+function updateClassroom() {
+  const id = parseInt(document.getElementById('editRoomId').value);
+  const idx = classrooms.findIndex(r => r.id === id);
+  if (idx < 0) return;
+  const editType   = document.getElementById('editRoomType').value;
+  const editIsLab  = editType === 'Lab';
+  classrooms[idx] = {
+    ...classrooms[idx],
+    name:       document.getElementById('editRoomName').value.trim(),
+    number:     document.getElementById('editRoomNumber').value.trim(),
+    type:       editType,
+    division:   editIsLab ? document.getElementById('editRoomLabDivision').value : document.getElementById('editRoomDivision').value,
+    labSubject: editIsLab ? document.getElementById('editRoomLabSubject').value  : '',
+  };
+  saveData();
+  renderAll();
+  closeModal('modalEditClassroom');
+}
+
+function deleteClassroom(id) {
+  if (!confirm('Delete this room?')) return;
+  classrooms = classrooms.filter(r => r.id !== id);
+  saveData();
+  renderAll();
+}
+
+// ── Check lab occupancy from timetable list view ──
+function checkLabOccupiedInTable(labName) {
+  const resultEl = document.getElementById('labCheckResult');
+  const conflicts = getLabOccupiedSlots(labName);
+
+  if (conflicts.length === 0) {
+    resultEl.style.background   = '#D1FAE5';
+    resultEl.style.border       = '1px solid #6EE7B7';
+    resultEl.style.color        = '#065F46';
+    resultEl.innerHTML = `✅ <strong>${labName}</strong> is free — no conflicts in any saved timetable.`;
+  } else {
+    resultEl.style.background   = '#FEE2E2';
+    resultEl.style.border       = '1px solid #FECACA';
+    resultEl.style.color        = '#991B1B';
+    resultEl.innerHTML =
+      `⚠️ <strong>${labName}</strong> is already used in the following saved timetable slots:<br>` +
+      conflicts.map(c => `&nbsp;&nbsp;• ${c}`).join('<br>');
+  }
+  resultEl.style.display = 'block';
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderClassrooms() {
+  const visible = getVisibleClassrooms();
+  const el = document.getElementById('countClassrooms');
+  if (el) el.textContent = visible.length;
+
+  const tbody = document.getElementById('classroomTableBody');
+  if (!tbody) return;
+
+  if (visible.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">🏫</div><div class="empty-text">No classrooms added yet. Click "+ Add Room" to get started.</div></div></td></tr>`;
+    return;
+  }
+
+  const typePills = {
+    'Classroom':    'pill-blue',
+    'Lab':          'pill-yellow',
+    'Seminar Hall': 'pill-purple',
+    'Lecture Hall': 'pill-green'
+  };
+  const statusPills = {
+    'Available':          'pill-green',
+    'Under Maintenance':  'pill-red',
+    'Reserved':           'pill-purple'
+  };
+
+  tbody.innerHTML = visible.map((r, i) => {
+    const divLabel = r.division
+      ? `<span class="pill pill-purple">${r.division.replace('-', ' Div ')}</span>`
+      : `<span style="color:var(--gray);font-size:12px;">Shared / Lab</span>`;
+    return `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${r.name}</strong></td>
+      <td style="color:var(--gray);font-size:12px;">${r.number}</td>
+      <td><span class="pill ${typePills[r.type] || 'pill-blue'}">${r.type}</span></td>
+      <td>${r.type === 'Lab'
+        ? (r.labSubject
+            ? `<span class='pill pill-yellow'>${r.labSubject}</span>${r.division ? ' · ' + r.division.replace('-',' Div ') : ''}`
+            : `<span style='color:var(--gray);font-size:12px;'>Shared lab</span>`)
+        : divLabel}</td>
+      <td>
+        <button onclick="checkLabOccupiedInTable('${r.name}')" style="background:#FFF9E6;color:#92400E;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;margin-right:6px;font-weight:600;">Check</button>
+        <button onclick="editClassroom(${r.id})" style="background:#E0F4FF;color:#0284C7;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;margin-right:6px;font-weight:600;">Edit</button>
+        <button onclick="deleteClassroom(${r.id})" style="background:#FEE2E2;color:#991B1B;border:none;padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;font-weight:600;">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
 // ========== RENDER ALL ==========
 function renderAll() {
   const visibleFaculty = getVisibleFaculty();
@@ -969,6 +1393,7 @@ function renderAll() {
   document.getElementById('countFaculty').textContent   = visibleFaculty.length;
   document.getElementById('countSubjects').textContent  = visibleSubjects.length;
   document.getElementById('countTimetables').textContent = JSON.parse(localStorage.getItem('ef_timetables') || '[]').length;
+  renderClassrooms();
 
   // faculty table
   const fb = document.getElementById('facultyTableBody');
@@ -1211,15 +1636,17 @@ function buildTimetableTableHtml(grid, options = {}) {
             <div style="background:${bg};border-radius:${printMode?'0':'8px'};padding:${printMode?'4px':'8px'};height:100%;min-height:${printMode?'80px':'120px'};display:flex;flex-direction:column;justify-content:center;gap:3px;${cellBorder}">
               <div style="font-weight:bold;font-size:${printMode?'10px':'12px'};color:#000;line-height:1.2;">${cell.name}</div>
               <div style="font-size:9px;color:#222;">(${cell.assignedFaculty || '-'})</div>
+              ${cell.room ? `<div style="font-size:9px;color:${printMode?'#000':'#0369a1'};font-weight:bold;">${cell.room}</div>` : ''}
               <div style="font-size:9px;color:#000;font-weight:bold;margin-top:2px;">Lab ${printMode?'(Double Slot)':'(DOUBLE SLOT)'}</div>
             </div>
           </td>`;
         }
 
-        return `<td style="border:${border};padding:${printMode?'4px':'6px'};vertical-align:middle;min-width:${printMode?'80px':'110px'};height:${printMode?'48px':'68px'};background:#fff;">
+        return `<td style="border:${border};padding:${printMode?'4px':'6px'};vertical-align:middle;min-width:${printMode?'80px':'110px'};height:${printMode?'58px':'68px'};background:#fff;">
           <div style="background:${bg};border-radius:${printMode?'0':'8px'};padding:${printMode?'4px':'8px'};line-height:1.4;${cellBorder}height:100%;display:flex;flex-direction:column;justify-content:center;gap:2px;">
             <div style="font-weight:bold;font-size:${printMode?'10px':'12px'};color:#000;">${cell.name}</div>
             <div style="font-size:9px;color:#222;">(${cell.assignedFaculty || '-'})</div>
+            ${cell.room ? `<div style="font-size:9px;color:${printMode?'#000':'#0369a1'};font-weight:bold;">${cell.room}</div>` : ''}
           </div>
         </td>`;
       }).join('')}
@@ -1322,20 +1749,90 @@ function loadSubjectsForTT() {
     return;
   }
 
-  list.innerHTML = filtered.map((s,i) => `
-    <div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr;gap:12px;align-items:center;padding:12px;background:#F7F9FC;border-radius:12px;margin-bottom:8px;">
-      <input type="checkbox" id="ttSub_${s.id}" value="${s.id}" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--sky);">
+  // Build room options based on subject type
+  const allRooms = getVisibleClassrooms();
+  const classroomOpts = allRooms.filter(r => r.type === 'Classroom' || r.type === 'Lecture Hall' || r.type === 'Seminar Hall');
+  const labOpts       = allRooms.filter(r => r.type === 'Lab');
+
+  // Find if this division has a permanently assigned classroom
+  const divKey = year + '-' + div; // e.g. "SY-B"
+  const permanentRoom = classroomOpts.find(r => r.division === divKey);
+
+  // Find which labs are already permanently assigned to subjects (across all saved timetables)
+  // Rule: same subject code → same lab always
+  const savedTTs = JSON.parse(localStorage.getItem('ef_timetables') || '[]');
+  const subjectLabMap = {}; // subjectCode -> labName
+  savedTTs.forEach(tt => {
+    if (!tt.grid) return;
+    Object.values(tt.grid).forEach(daySlots => {
+      Object.values(daySlots).forEach(cell => {
+        if (cell && cell.lab && cell.labPart === 1 && cell.room && cell.code) {
+          subjectLabMap[cell.code] = cell.room;
+        }
+      });
+    });
+  });
+
+  list.innerHTML = filtered.map((s,i) => {
+    const isLab   = s.type === 'Lab';
+    const rooms   = isLab ? labOpts : classroomOpts;
+
+    // Auto-select room:
+    // Lectures → permanent classroom for this division
+    // Labs     → 1) room configured with labSubject matching this subject
+    //            2) previously used lab from saved timetables
+    let autoRoom = '';
+    if (!isLab && permanentRoom) {
+      autoRoom = permanentRoom.name + ' (' + permanentRoom.number + ')';
+    } else if (isLab) {
+      // Check if any lab room is specifically assigned to this subject
+      const subjectName = (s.name || '').trim().toLowerCase();
+      const configuredLab = labOpts.find(r =>
+        r.labSubject && r.labSubject.trim().toLowerCase() === subjectName
+      );
+      if (configuredLab) {
+        autoRoom = configuredLab.name + ' (' + configuredLab.number + ')';
+      } else if (s.code && subjectLabMap[s.code]) {
+        // Fall back to previously used lab from saved timetables
+        autoRoom = subjectLabMap[s.code];
+      }
+    }
+
+    const roomOptHtml = rooms.length
+      ? rooms.map(r => {
+          const val = r.name + ' (' + r.number + ')';
+          const sel = val === autoRoom ? 'selected' : '';
+          const hint = r.division ? ' [' + r.division.replace('-',' Div ') + ']' : '';
+          return `<option value="${val}" ${sel}>${r.name} · ${r.number} · Cap:${r.capacity}${hint}</option>`;
+        }).join('')
+      : `<option value="">No ${isLab?'labs':'classrooms'} added yet</option>`;
+
+    const roomBg     = isLab ? '#FFF9E6' : '#F0FDF4';
+    const roomLabel  = isLab ? 'Assign Lab' : (permanentRoom && !isLab ? '🔒 ' + permanentRoom.name : 'Assign Classroom');
+    const lockedNote = (!isLab && permanentRoom)
+      ? `<div style="font-size:10px;color:#059669;margin-top:2px;">📌 Permanent room for ${divKey.replace('-',' Div ')}</div>`
+      : (isLab && autoRoom ? `<div style="font-size:10px;color:#d97706;margin-top:2px;">📌 Same lab as other divisions</div>` : '');
+
+    return `
+    <div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr;gap:10px;align-items:start;padding:12px;background:#F7F9FC;border-radius:12px;margin-bottom:8px;">
+      <input type="checkbox" id="ttSub_${s.id}" value="${s.id}" checked style="width:18px;height:18px;cursor:pointer;accent-color:var(--sky);margin-top:14px;">
       <div>
         <div style="font-weight:600;font-size:14px;">${s.name}</div>
         <div style="font-size:11px;color:var(--gray);">${s.code || ''} · ${s.type} · ${s.grades} lec/week</div>
       </div>
-      <select id="ttFac_${s.id}" style="padding:8px 12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+      <select id="ttFac_${s.id}" style="padding:8px 10px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
         <option value="">Assign Faculty</option>
         ${getVisibleFaculty().map(f => `<option value="${f.name}" ${f.name===s.faculty?'selected':''}>${f.name}</option>`).join('')}
       </select>
-      <span class="pill pill-purple">${s.grades} per week</span>
-    </div>
-  `).join('');
+      <div>
+        <select id="ttRoom_${s.id}" style="padding:8px 10px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:${roomBg};width:100%;">
+          <option value="">${roomLabel}</option>
+          ${roomOptHtml}
+        </select>
+        ${lockedNote}
+      </div>
+    </div>`;
+  }).join('');
 
   document.getElementById('ttAssign').style.display = 'block';
   document.getElementById('ttAssign').scrollIntoView({ behavior:'smooth' });
@@ -1353,7 +1850,8 @@ function generateTimetable() {
     return cb && cb.checked;
   }).map(s => ({
     ...s,
-    assignedFaculty: document.getElementById('ttFac_' + s.id)?.value || s.faculty
+    assignedFaculty: document.getElementById('ttFac_' + s.id)?.value || s.faculty,
+    assignedRoom:    document.getElementById('ttRoom_' + s.id)?.value || ''
   }));
 
   if (selected.length === 0) { alert('Please select at least one subject!'); return; }
@@ -1407,7 +1905,9 @@ function generateTimetable() {
   });
   const mdmAnchorSlotSet = new Set(mdmAnchorSlots.map(a => `${a.day}|${a.si}`));
   const hasMDMInSelection = selected.some(s => (s.name || '').toUpperCase().includes('MDM') && s.type !== 'Lab');
-  const bookedSlots = new Set();
+  const bookedSlots = new Set();  // "facultyKey|day|si"
+  const bookedLabs  = new Set();  // "roomName|day|si" — prevent double-booking a lab room
+
   otherTTs.forEach(tt => {
     if (!tt.grid) return;
     Object.entries(tt.grid).forEach(([day, slots]) => {
@@ -1415,6 +1915,11 @@ function generateTimetable() {
         if (cell && cell.assignedFaculty) {
           const facultyKey = normalizeFacultyKey(cell.assignedFaculty);
           if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
+        }
+        // Track lab room bookings from all other saved timetables
+        if (cell && cell.lab && cell.room) {
+          const roomKey = cell.room.toLowerCase().trim();
+          bookedLabs.add(roomKey + '|' + day + '|' + si);
         }
       });
     });
@@ -1431,6 +1936,50 @@ function generateTimetable() {
     const cell = grid[day][si];
     if (cell && normalizeFacultyKey(cell.assignedFaculty) === facultyKey) return false;
     return true;
+  }
+
+  // isLabFree: returns true if the lab room is not already booked at (day, si)
+  // across ALL saved timetables AND the current grid being built.
+  function isLabFree(roomName, day, si) {
+    if (!roomName) return true;
+    const roomKey = roomName.toLowerCase().trim();
+    // Check saved timetables
+    if (bookedLabs.has(roomKey + '|' + day + '|' + si)) return false;
+    // Check current grid being built
+    const cell = grid[day][si];
+    if (cell && cell.room && cell.room.toLowerCase().trim() === roomKey) return false;
+    return true;
+  }
+
+  // findFreeLabRoom: find the correct lab room for a subject.
+  // Priority:
+  //   1. If admin manually selected a room (assignedRoom) in timetable generator → use it
+  //   2. If a classroom record has labSubject matching this subject → use that room (if free)
+  //   3. If no match found → leave room empty (do NOT auto-assign random lab)
+  function findFreeLabRoom(sub, allLabRooms, day, s1, s2) {
+    // 1. Manual selection in timetable generator
+    const manualRoom = sub.assignedRoom || '';
+    if (manualRoom) {
+      if (isLabFree(manualRoom, day, s1) && isLabFree(manualRoom, day, s2)) return manualRoom;
+      // manual room is occupied — try next free lab that is assigned to this subject
+    }
+
+    // 2. Find rooms that are specifically assigned to this subject
+    const subjectName = (sub.name || '').trim().toLowerCase();
+    const subjectRooms = allLabRooms.filter(r =>
+      r.labSubject && r.labSubject.trim().toLowerCase() === subjectName
+    );
+    for (const r of subjectRooms) {
+      const roomVal = r.name + ' (' + r.number + ')';
+      if (isLabFree(roomVal, day, s1) && isLabFree(roomVal, day, s2)) return roomVal;
+    }
+
+    // 3. If subject has no specific lab assigned, try the manual room (even if first attempt failed above)
+    // but do NOT auto-assign unrelated labs
+    if (manualRoom) return manualRoom; // return preferred even if occupied (will show conflict)
+
+    // 4. No room configured for this subject → return empty
+    return '';
   }
 
   // ── HELPERS ───────────────────────────────────────────────────
@@ -1457,6 +2006,9 @@ function generateTimetable() {
   function subOnDay(day, subjectKey) {
     return Object.values(grid[day]).some(c => c && getSubjectIdentityKey(c) === subjectKey);
   }
+
+  // ── All lab rooms available for auto-assignment ──
+  const allLabRoomsForGen = getVisibleClassrooms().filter(r => r.type === 'Lab');
 
   // ── SORT: Labs first, then MDM, then other lectures ──
   // This ensures MDM slots are secured before normal lectures fill them.
@@ -1498,13 +2050,20 @@ function generateTimetable() {
           if (!grid[day][s1] && !grid[day][s2] &&
               isFacultyFree(sub.assignedFaculty, day, s1) &&
               isFacultyFree(sub.assignedFaculty, day, s2)) {
-            grid[day][s1] = { ...sub, color, lab: true, labPart: 1 };
-            grid[day][s2] = { ...sub, color, lab: true, labPart: 2 };
-            // Mark these slots as booked in the current grid's faculty tracker
+            // Find a free lab room (respects lab clash across all divisions)
+            const freeRoom = findFreeLabRoom(sub, allLabRoomsForGen, day, s1, s2);
+            grid[day][s1] = { ...sub, color, lab: true, labPart: 1, room: freeRoom };
+            grid[day][s2] = { ...sub, color, lab: true, labPart: 2, room: freeRoom };
+            // Mark these slots as booked in the current grid's faculty + lab trackers
             const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
             if (facultyKey) {
               bookedSlots.add(facultyKey + '|' + day + '|' + s1);
               bookedSlots.add(facultyKey + '|' + day + '|' + s2);
+            }
+            if (freeRoom) {
+              const rk = freeRoom.toLowerCase().trim();
+              bookedLabs.add(rk + '|' + day + '|' + s1);
+              bookedLabs.add(rk + '|' + day + '|' + s2);
             }
             placed++;
             break;
@@ -1542,7 +2101,7 @@ function generateTimetable() {
           // For MDM (first division being generated): place freely, skip faculty clash
           if (isMDM) {
             if (!grid[day][si]) {
-              grid[day][si] = { ...sub, color };
+              grid[day][si] = { ...sub, color, room: sub.assignedRoom || '' };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
               placed++;
@@ -1550,7 +2109,7 @@ function generateTimetable() {
             }
           } else {
             if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
-              grid[day][si] = { ...sub, color };
+              grid[day][si] = { ...sub, color, room: sub.assignedRoom || '' };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
               placed++;
@@ -1590,7 +2149,7 @@ function generateTimetable() {
           if (!isMDM && hasMDMInSelection && mdmAnchorSlotSet.has(`${day}|${si}`)) continue;
           if (isMDM) {
             if (!grid[day][si]) {
-              grid[day][si] = { ...sub, color };
+              grid[day][si] = { ...sub, color, room: sub.assignedRoom || '' };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
               placed++;
@@ -1598,7 +2157,7 @@ function generateTimetable() {
             }
           } else {
             if (!grid[day][si] && isFacultyFree(sub.assignedFaculty, day, si)) {
-              grid[day][si] = { ...sub, color };
+              grid[day][si] = { ...sub, color, room: sub.assignedRoom || '' };
               const facultyKey = normalizeFacultyKey(sub.assignedFaculty);
               if (facultyKey) bookedSlots.add(facultyKey + '|' + day + '|' + si);
               placed++;
@@ -1623,6 +2182,29 @@ function generateTimetable() {
     showTimetableWarning(`Some subjects are only partially scheduled due to faculty clash rules or limited slots: ${unplacedSubjects.join(', ')}`);
   } else {
     showTimetableWarning('');
+  }
+
+  // ── Show lab room assignment summary ──
+  const labSummary = [];
+  DAYS.forEach(day => {
+    SLOTS.forEach((slot, si) => {
+      const cell = grid[day][si];
+      if (cell && cell.lab && cell.labPart === 1) {
+        labSummary.push(
+          `<span style="background:#FFF9E6;border:1px solid #F59E0B;border-radius:8px;padding:4px 10px;font-size:12px;display:inline-block;margin:3px;">` +
+          `🧪 <strong>${cell.name}</strong> → <span style="color:#0369a1;font-weight:600;">${cell.room || '⚠ No room'}</span> on ${day}</span>`
+        );
+      }
+    });
+  });
+  const summaryEl = document.getElementById('ttLabSummary');
+  if (summaryEl) {
+    if (labSummary.length > 0) {
+      summaryEl.innerHTML = '<div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#0369a1;">🏫 Lab Room Assignments (auto-assigned, conflict-free):</div>' + labSummary.join('');
+      summaryEl.style.display = 'block';
+    } else {
+      summaryEl.style.display = 'none';
+    }
   }
 
   // store current tt for saving
@@ -1657,7 +2239,7 @@ function saveTimetable() {
   // ── Notify backend: save timetable to DB + send faculty emails ──
   notifyTimetableSaved(window._currentTT);
 
-  alert('✅ Timetable saved! Faculty will receive email notifications.');
+  alert('✅ Timetable saved!');
   renderAll();
 }
 
@@ -1728,6 +2310,8 @@ function printTT() {
     th,td{border:1px solid #000;padding:5px 6px;vertical-align:middle;text-align:center;}
     th{font-weight:bold;background:#fff;font-size:11px;}
     td{font-size:10px;}
+    /* Ensure room name prints in color */
+    @media print { * { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
   <\/style>
   </head><body>${content}</body></html>`);
   w.document.close();

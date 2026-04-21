@@ -627,7 +627,9 @@ function buildFacultyTimetableTableHtml(tt, ttIdentity, busyKeys) {
             <div style="background:${bg};border-radius:8px;padding:8px;min-height:140px;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;border:1px solid rgba(0,0,0,0.14);">
               <div style="font-weight:700;font-size:12px;color:#0A0A0A;line-height:1.2;">${cell.name || ''}</div>
               <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || cell.faculty || 'Faculty: -'}</div>
-              <div style="font-size:10px;color:#1D4ED8;font-weight:700;margin-top:2px;">LAB (DOUBLE SLOT)</div>
+              ${cell.room
+                ? `<div style="font-size:10px;color:#0369a1;font-weight:700;">📍 ${cell.room} · LAB</div>`
+                : '<div style="font-size:10px;color:#1D4ED8;font-weight:700;margin-top:2px;">LAB (DOUBLE SLOT)</div>'}
               ${actionsBlock}
             </div>
           </td>`;
@@ -638,6 +640,7 @@ function buildFacultyTimetableTableHtml(tt, ttIdentity, busyKeys) {
           <div style="background:${bg};border-radius:8px;padding:8px;line-height:1.45;border:1px solid rgba(0,0,0,0.14);display:flex;flex-direction:column;gap:6px;min-height:72px;">
             <div style="font-weight:700;font-size:12px;color:#0A0A0A;">${cell.name || ''}</div>
             <div style="font-size:10px;color:#374151;">${cell.assignedFaculty || cell.faculty || 'Faculty: -'}</div>
+            ${cell.room ? `<div style="font-size:10px;color:#0369a1;font-weight:700;margin-top:1px;">📍 ${cell.room}</div>` : ''}
             ${actionsBlock}
           </div>
         </td>`;
@@ -1080,12 +1083,13 @@ function printTimetableFromFaculty() {
     rows += `<tr><td style="padding:5px;border:1px solid #000;text-align:center;font-size:10px;font-weight:bold;white-space:nowrap;">${slot.label}</td>`;
     PRINT_DAYS.forEach(day => {
       const cell = (tt.grid[day] && tt.grid[day][si]) || null;
-      if (!cell) { rows += `<td style="border:1px solid #000;padding:4px;min-width:80px;height:48px;"></td>`; return; }
+      if (!cell) { rows += `<td style="border:1px solid #000;padding:4px;min-width:80px;height:58px;"></td>`; return; }
       if (cell.lab && cell.labPart === 2) return;
       const rowspan = (cell.lab && cell.labPart === 1) ? ' rowspan="2"' : '';
       rows += `<td${rowspan} style="border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;">
         <div style="font-weight:bold;font-size:10px;">${cell.name || ''}</div>
         <div style="font-size:9px;color:#333;">(${cell.assignedFaculty || cell.faculty || '-'})</div>
+        ${cell.room ? `<div style="font-size:9px;font-weight:bold;color:#000;">${cell.room}</div>` : ''}
         ${cell.lab ? '<div style="font-size:9px;font-weight:bold;">Lab (Double Slot)</div>' : ''}
       </td>`;
     });
@@ -1093,7 +1097,7 @@ function printTimetableFromFaculty() {
   });
 
   const content = `<!DOCTYPE html><html><head><title>${title}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}@page{size:A4 landscape;margin:10mm;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;}</style>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;background:#fff;color:#000;padding:10mm;}@page{size:A4 landscape;margin:10mm;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;text-align:center;}@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style>
   </head><body>
   <div style="border:2px solid #000;width:100%;">
     <div style="border-bottom:2px solid #000;padding:8px;text-align:center;">
