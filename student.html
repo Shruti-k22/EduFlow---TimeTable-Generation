@@ -391,7 +391,10 @@ function renderTodayClasses() {
 
     count++;
     const start = SLOT_START[si];
-    const end   = SLOT_END[si];
+    // For lab double slots, use the END time of the NEXT slot (labPart 2)
+    const isLabDouble = cell.lab && cell.labPart === 1;
+    const nextSi = si + 1; // labPart 2 is always the next slot index
+    const end = isLabDouble && SLOT_END[nextSi] ? SLOT_END[nextSi] : SLOT_END[si];
     const startMins = start ? start[0]*60+start[1] : 0;
     const endMins   = end   ? end[0]*60+end[1]     : 0;
     const isNow = start && nowMins >= startMins && nowMins < endMins;
@@ -402,9 +405,14 @@ function renderTodayClasses() {
     const typeLabel    = cell.lab ? 'Lab' : 'Lecture';
     const pillClass    = cell.lab ? 'yellow' : 'blue';
 
+    // For lab double slots, build combined time label e.g. "11:15 – 12:55"
+    const startLabel = start ? `${start[0]}:${String(start[1]).padStart(2,'0')}` : '';
+    const endLabel   = end   ? `${end[0]}:${String(end[1]).padStart(2,'0')}` : '';
+    const timeLabel  = isLabDouble ? `${startLabel} – ${endLabel}` : slot.label;
+
     html += `
       <div class="today-slot" style="${isNow ? 'border-color:#38BDF8;background:#F0F9FF;' : isPast ? 'opacity:0.5;' : ''}">
-        <div class="today-time">${slot.label}</div>
+        <div class="today-time">${timeLabel}</div>
         <div style="flex:1">
           <div class="today-subject">${subjectLabel}</div>
           <div class="today-faculty">${facLabel}</div>
